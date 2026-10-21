@@ -133,6 +133,9 @@ class GloboDemoControls {
   }
 
   destroy() {
+    const guideLayer = this.guide?.closest('.gpf-demo-guide-section');
+    if (guideLayer?.matches(':popover-open')) guideLayer.hidePopover();
+    guideLayer?.removeAttribute('popover');
     this.root?.removeEventListener('click', this.handleClick);
     this.guideToggle?.removeEventListener('click', this.handleGuideToggle);
     this.root?.removeEventListener('change', this.handleChange);
@@ -2071,6 +2074,18 @@ class GloboDemoControls {
     const progress = this.guide?.querySelector('.gpf-demo-progress__text');
     const pillCount = pill?.querySelector('[data-demo-guide-pill-count]');
     if (pillCount && progress) pillCount.textContent = progress.textContent.replace(/\s+/g, '');
+
+    const guideLayer = this.guide?.closest('.gpf-demo-guide-section');
+    if (!guideLayer) return;
+
+    if (this.deviceBreakpoint.matches) {
+      guideLayer.setAttribute('popover', 'manual');
+      if (isOpen && !guideLayer.matches(':popover-open')) guideLayer.showPopover();
+      else if (!isOpen && guideLayer.matches(':popover-open')) guideLayer.hidePopover();
+    } else {
+      if (guideLayer.matches(':popover-open')) guideLayer.hidePopover();
+      guideLayer.removeAttribute('popover');
+    }
   }
 
   updateStage(device) {

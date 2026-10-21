@@ -58,6 +58,8 @@
   const overlay = root.querySelector('[data-gf-promo-overlay]');
   const dialog = root.querySelector('.gf-promo__dialog');
   const closeButton = root.querySelector('.gf-promo__close');
+  const dismissButton = root.querySelector('.gf-promo__dismiss');
+  const bar = root.querySelector('.gf-promo__bar');
   let previouslyFocused = null;
 
   const openDialog = () => {
@@ -74,10 +76,19 @@
 
   trigger.addEventListener('click', openDialog);
   closeButton.addEventListener('click', closeDialog);
+  dismissButton.addEventListener('click', () => {
+    closeDialog();
+    root.hidden = true;
+    barObserver.disconnect();
+  });
   overlay.addEventListener('click', (event) => { if (event.target === overlay) closeDialog(); });
   document.addEventListener('keydown', (event) => {
     if (event.key === 'Escape' && !overlay.hidden) closeDialog();
   });
 
   root.hidden = false;
+  const barObserver = new ResizeObserver(() => {
+    root.style.setProperty('--gf-promo-bar-height', `${Math.ceil(bar.getBoundingClientRect().height)}px`);
+  });
+  barObserver.observe(bar);
 })();

@@ -8,6 +8,10 @@
  * ------------------------------------------------------------
  */
 {
+  "demo_promo": {
+    "learn_more": "Learn more",
+    "dismiss": "Dismiss promotion"
+  },
   "accessibility": {
     "account": "Account",
     "active_filters": "Active filters:",

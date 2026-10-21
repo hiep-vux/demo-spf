@@ -1,3 +1,7 @@
+{% doc %}
+  Renders the demo controls and responsive mobile toolbar.
+  @param {section} section - Toolbar settings.
+{% enddoc %}
 {%- liquid
   assign show_demo_guide_actions = false
   if request.page_type == 'collection' or request.page_type == 'search'
@@ -77,15 +81,6 @@
       </select>
     </label>
 
-    {%- unless section.settings.show_view_mode == false -%}
-      <label class="gpf-demo-toolbar__select-field" data-demo-toolbar-group="device">
-        <span class="gpf-demo-toolbar__label">{{ section.settings.device_label | default: 'View' }}</span>
-        <select class="gpf-demo-toolbar__select" data-demo-select="device" aria-label="{{ section.settings.device_label | default: 'Preview device' | escape }}">
-          <option value="desktop" selected>{{ section.settings.desktop_label | default: 'Desktop' }}</option>
-          <option value="mobile">{{ section.settings.mobile_label | default: 'Mobile' }}</option>
-        </select>
-      </label>
-    {%- endunless -%}
   </div>
 
   <div class="gpf-demo-toolbar__navigation" hidden aria-hidden="true">
@@ -94,8 +89,6 @@
     <a href="{{ drawer_initial_url | default: routes.root_url }}" data-demo-layout-link="drawer" data-fashion-href="{{ section.settings.fashion_drawer_url | default: routes.root_url }}" data-auto-href="{{ section.settings.auto_drawer_url | default: routes.root_url }}"{% if section.settings.layout_links_new_tab %} target="_blank" rel="noopener noreferrer"{% endif %}></a>
     <a href="{{ fashion_store_url | default: routes.root_url }}" data-demo-control="store" data-demo-value="fashion" data-demo-store-link="fashion"{% if section.settings.store_links_new_tab %} target="_blank" rel="noopener noreferrer"{% endif %}></a>
     <a href="{{ auto_store_url | default: routes.root_url }}" data-demo-control="store" data-demo-value="auto" data-demo-store-link="auto"{% if section.settings.store_links_new_tab %} target="_blank" rel="noopener noreferrer"{% endif %}></a>
-    <button type="button" data-demo-control="device" data-demo-value="desktop"></button>
-    <button type="button" data-demo-control="device" data-demo-value="mobile"></button>
   </div>
 
   <template data-demo-store-custom-js="fashion">{{ section.settings.fashion_custom_js | escape }}</template>
@@ -103,9 +96,13 @@
 
   <div class="gpf-demo-toolbar__actions">
     {% if show_demo_guide_actions %}
-      <button type="button" data-demo-action="reset" class="gpf-demo-button gpf-demo-button--outline">{{ section.settings.reset_label | default: 'Reset demo' }}</button>
-      <button type="button" data-demo-action="toggle-guide" class="gpf-demo-button gpf-demo-button--dark" aria-controls="gpf-demo-guide" aria-expanded="true">
-        <span data-demo-guide-label>{{ section.settings.hide_guide_label | default: 'Hide guide' }}</span>
+      <button type="button" data-demo-action="reset" class="gpf-demo-button gpf-demo-button--outline gpf-demo-button--icon-mobile" aria-label="{{ section.settings.reset_label | default: 'Reset demo' | escape }}">
+        <svg class="gpf-demo-button__icon" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M3 10a9 9 0 1 0 3-5M3 4v6h6"/></svg>
+        <span class="gpf-demo-button__text">{{ section.settings.reset_label | default: 'Reset demo' }}</span>
+      </button>
+      <button type="button" data-demo-action="toggle-guide" class="gpf-demo-button gpf-demo-button--dark gpf-demo-button--icon-mobile" aria-label="{{ section.settings.hide_guide_label | default: 'Hide guide' | escape }}" aria-controls="gpf-demo-guide" aria-expanded="true">
+        <svg class="gpf-demo-button__icon" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M2 12s3.5-7 10-7 10 7 10 7-3.5 7-10 7S2 12 2 12Z"/><circle cx="12" cy="12" r="3"/><path class="gpf-demo-button__eye-slash" d="m3 3 18 18"/></svg>
+        <span class="gpf-demo-button__text" data-demo-guide-label>{{ section.settings.hide_guide_label | default: 'Hide guide' }}</span>
       </button>
     {% endif %}
     <a href="{{ section.settings.trial_url | default: 'https://apps.shopify.com/product-filter-and-search' }}"{% if section.settings.trial_new_tab %} target="_blank" rel="noopener noreferrer"{% endif %} class="gpf-demo-button gpf-demo-button--primary">

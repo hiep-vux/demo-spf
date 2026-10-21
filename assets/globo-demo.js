@@ -32,6 +32,7 @@ class GloboDemoControls {
     this.stage = this.root?.querySelector('.gpf-demo__storefront');
     this.guide = this.root?.querySelector('#gpf-demo-guide');
     this.mobileBreakpoint = window.matchMedia('(max-width: 1179px)');
+    this.deviceBreakpoint = window.matchMedia('(max-width: 749px)');
     this.guideCards = Array.from(this.root?.querySelectorAll('.gpf-demo-step[data-demo-step]') || []);
     this.guideStepConfigs = this.readGuideStepConfigs();
     this.appliedGuideAttributes = new WeakMap();
@@ -52,7 +53,7 @@ class GloboDemoControls {
 
     this.defaults = {
       store: toolbar.dataset.defaultStore || 'fashion',
-      device: toolbar.dataset.defaultDevice || 'desktop',
+      device: this.deviceBreakpoint.matches ? 'mobile' : 'desktop',
       searchLayout: SEARCH_LAYOUTS.includes(toolbar.dataset.defaultSearchLayout)
         ? toolbar.dataset.defaultSearchLayout
         : 'overlay',
@@ -64,11 +65,7 @@ class GloboDemoControls {
       store: navigationState.store || (['fashion', 'auto'].includes(persistedState.store)
         ? persistedState.store
         : this.defaults.store),
-      device: this.mobileBreakpoint.matches
-        ? 'mobile'
-        : ['desktop', 'mobile'].includes(persistedState.device)
-        ? persistedState.device
-        : this.defaults.device,
+      device: this.defaults.device,
       searchLayout: SEARCH_LAYOUTS.includes(persistedState.searchLayout)
         ? persistedState.searchLayout
         : this.defaults.searchLayout,
@@ -110,6 +107,7 @@ class GloboDemoControls {
     this.root.addEventListener('change', this.handleChange);
     this.root.addEventListener('click', this.handleGuideStepCapture, true);
     this.mobileBreakpoint.addEventListener('change', this.handleViewportChange);
+    this.deviceBreakpoint.addEventListener('change', this.handleViewportChange);
     document.addEventListener('theme-drawer:open', this.handleThemeDrawerOpen);
     document.addEventListener('theme-drawer:close', this.handleThemeDrawerClose);
     window.addEventListener('resize', this.updateToolbarHeight);
@@ -136,6 +134,7 @@ class GloboDemoControls {
     this.root?.removeEventListener('change', this.handleChange);
     this.root?.removeEventListener('click', this.handleGuideStepCapture, true);
     this.mobileBreakpoint.removeEventListener('change', this.handleViewportChange);
+    this.deviceBreakpoint.removeEventListener('change', this.handleViewportChange);
     document.removeEventListener('theme-drawer:open', this.handleThemeDrawerOpen);
     document.removeEventListener('theme-drawer:close', this.handleThemeDrawerClose);
     window.removeEventListener('resize', this.updateToolbarHeight);
@@ -400,6 +399,7 @@ class GloboDemoControls {
   }
 
   async runLayoutGuideNavigation(card, intent) {
+    if (intent.device === 'mobile' && !this.deviceBreakpoint.matches) return;
     this.startGuideAction(card);
 
     const previous = { ...this.state };
@@ -1077,7 +1077,7 @@ class GloboDemoControls {
     this.state = {
       ...this.state,
       store: 'fashion',
-      device: this.mobileBreakpoint.matches ? 'mobile' : this.state.device,
+      device: this.deviceBreakpoint.matches ? 'mobile' : 'desktop',
     };
     this.persistState();
 
@@ -1725,53 +1725,7 @@ class GloboDemoControls {
     }
 
     if (control && value) {
-      if (control === 'device' && ['desktop', 'mobile'].includes(value)) {
-        const switchingToDesktop = value === 'desktop' && this.state.device === 'mobile';
-        const activatingMobileSidebar = value === 'mobile'
-          && (this.state.device !== 'mobile' || this.toolbar.dataset.activeLayout !== 'sidebar');
-
-        if (value === 'mobile' && this.state.device !== 'mobile') {
-          const currentLayout = this.toolbar.dataset.activeLayout;
-          if (FILTER_LAYOUTS.includes(currentLayout)) this.desktopLayout = currentLayout;
-        }
-
-        if (switchingToDesktop) {
-          this.toolbar.dataset.activeLayout = FILTER_LAYOUTS.includes(this.desktopLayout)
-            ? this.desktopLayout
-            : 'sidebar';
-        }
-
-        window.globoFilterIsMobileDevice = value === 'mobile';
-
-        if (value === 'mobile') {
-          this.toolbar.dataset.activeLayout = 'sidebar';
-          window.dispatchEvent(new CustomEvent('globoFilterRenderCompleted'));
-        }
-
-        this.setState({ [control]: value });
-
-        if (activatingMobileSidebar) {
-          const sidebarLink = this.toolbar.querySelector('[data-demo-layout-link="sidebar"]');
-          this.navigateWithSkeleton(sidebarLink, 'sidebar');
-        }
-
-        if (value === 'desktop') {
-          const activeLayout = this.toolbar.dataset.activeLayout || 'sidebar';
-          const activeLayoutLink = this.toolbar.querySelector(
-            `[data-demo-layout-link="${activeLayout}"]`
-          );
-
-          if (activeLayoutLink instanceof HTMLAnchorElement) {
-            if (switchingToDesktop) {
-              this.navigateWithSkeleton(activeLayoutLink, activeLayout);
-            } else {
-              activeLayoutLink.click();
-            }
-          }
-        }
-
-        return;
-      }
+      if (control === 'device') return;
 
       this.setState({ [control]: value });
       return;
@@ -1797,19 +1751,10 @@ class GloboDemoControls {
     }
   }
 
-  // Device Mode function
-  handleViewportChange(event) {
-    // if (!event.matches) return;
-
-    // const currentLayout = this.toolbar.dataset.activeLayout;
-    // if (this.state.device !== 'mobile' && FILTER_LAYOUTS.includes(currentLayout)) {
-    //   this.desktopLayout = currentLayout;
-    // }
-
-    // window.globoFilterIsMobileDevice = true;
-    // this.toolbar.dataset.activeLayout = 'sidebar';
-    // this.setState({ device: 'mobile', guideOpen: false });
-    // window.dispatchEvent(new CustomEvent('globoFilterRenderCompleted'));
+  handleViewportChange() {
+    const device = this.deviceBreakpoint.matches ? 'mobile' : 'desktop';
+    if (this.state.device === device) return;
+    this.setState({ device });
   }
 
   /** @param {Partial<typeof this.state>} patch */
@@ -1986,8 +1931,10 @@ class GloboDemoControls {
 
   /** @param {{ previous?: object, emit?: boolean, reset?: boolean }} options */
   render(options = {}) {
+    this.state.device = this.deviceBreakpoint.matches ? 'mobile' : 'desktop';
     const { store, device, searchLayout, guideOpen } = this.state;
 
+    window.globoFilterIsMobileDevice = device === 'mobile';
     this.root.dataset.demoStore = store;
     this.root.dataset.demoDevice = device;
     this.root.dataset.demoSearchLayout = device === 'mobile' ? 'overlay' : searchLayout;
@@ -2095,6 +2042,7 @@ class GloboDemoControls {
       label.textContent = isOpen
         ? (this.toolbar.dataset.guideLabelOpen || 'Hide guide')
         : (this.toolbar.dataset.guideLabelClosed || 'Show guide');
+      toggle?.setAttribute('aria-label', label.textContent);
     }
 
     const pill = this.root.querySelector('[data-demo-guide-pill]');

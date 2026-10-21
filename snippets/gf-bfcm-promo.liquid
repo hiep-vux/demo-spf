@@ -1,17 +1,26 @@
+{% doc %}
+  Renders the campaign promotion and its mobile bottom bar.
+{% enddoc %}
 <div id="gf-bfcm-promo" class="gf-promo" hidden>
-  <button class="gf-promo__trigger" type="button" aria-expanded="false" aria-controls="gf-bfcm-promo-dialog">
-    <span class="gf-promo__gift" aria-hidden="true">
-      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-        <rect x="3" y="8" width="18" height="4" rx="1"></rect>
-        <path d="M12 8v13M5 12v7a2 2 0 0 0 2 2h10a2 2 0 0 0 2-2v-7"></path>
-        <path d="M7.5 8a2.5 2.5 0 0 1 0-5C9.5 3 12 8 12 8s2.5-5 4.5-5a2.5 2.5 0 0 1 0 5"></path>
-      </svg>
-    </span>
-    <span class="gf-promo__trigger-copy">
-      <strong data-gf-promo-badge></strong>
-      <span data-gf-promo-trigger-text></span>
-    </span>
-  </button>
+  <div class="gf-promo__bar">
+    <button class="gf-promo__trigger" type="button" aria-expanded="false" aria-controls="gf-bfcm-promo-dialog">
+      <span class="gf-promo__gift" aria-hidden="true">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+          <rect x="3" y="8" width="18" height="4" rx="1"></rect>
+          <path d="M12 8v13M5 12v7a2 2 0 0 0 2 2h10a2 2 0 0 0 2-2v-7"></path>
+          <path d="M7.5 8a2.5 2.5 0 0 1 0-5C9.5 3 12 8 12 8s2.5-5 4.5-5a2.5 2.5 0 0 1 0 5"></path>
+        </svg>
+      </span>
+      <span class="gf-promo__trigger-copy">
+        <strong data-gf-promo-badge></strong>
+        <span data-gf-promo-trigger-text></span>
+      </span>
+      <span class="gf-promo__learn-more">{{ 'demo_promo.learn_more' | t }}</span>
+    </button>
+    <button class="gf-promo__dismiss" type="button" aria-label="{{ 'demo_promo.dismiss' | t | escape }}">
+      <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" aria-hidden="true"><path d="m6 6 12 12M18 6 6 18"/></svg>
+    </button>
+  </div>
 
   <div class="gf-promo__overlay" data-gf-promo-overlay hidden>
     <section class="gf-promo__dialog" id="gf-bfcm-promo-dialog" role="dialog" aria-modal="true" aria-labelledby="gf-bfcm-promo-title" tabindex="-1">
@@ -38,6 +47,8 @@
   .gf-promo, .gf-promo * { box-sizing: border-box; }
   .gf-promo { --gf-promo-bg-1: #551651; --gf-promo-bg-2: #671b55; --gf-promo-bg-3: #7a2651; --gf-promo-accent: #e9475b; --gf-promo-glass: rgba(255,255,255,.14); --gf-promo-ring: rgba(255,255,255,.22); --gf-promo-muted: rgba(255,255,255,.86); font-family: Inter, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif; }
   .gf-promo[hidden], .gf-promo [hidden] { display: none !important; }
+  .gf-promo__bar { display: contents; }
+  .gf-promo__learn-more, .gf-promo__dismiss { display: none; }
   .gf-promo__trigger {
     position: fixed; left: 20px; bottom: 24px; z-index: 2147482998;
     display: flex; align-items: stretch; min-height: 58px; padding: 0;
@@ -75,10 +86,20 @@
   .gf-promo__local { opacity: .74; }
   .gf-promo__cta { display: inline-flex; min-height: 42px; align-items: center; justify-content: center; margin-top: 4px; padding: 9px 18px; color: #5d0a32; background: #fff; border-radius: 999px; font-size: 14px; font-weight: 700; text-decoration: none; }
   .gf-promo__content .gf-promo__eligibility { margin: 10px 0 0; font-size: 11px; opacity: .76; }
-  @media (max-width: 600px) {
-    .gf-promo__trigger { left: 16px; bottom: 100px; max-width: calc(100vw - 32px); transform: none; }
-    .gf-promo__overlay { align-items: end; justify-items: center; padding: 16px 16px 88px; }
-    .gf-promo__dialog { grid-template-columns: 1fr; justify-items: center; gap: 14px; width: 100%; max-width: 570px; padding: 22px 20px; text-align: center; border-radius: 20px; }
+  @media (max-width: 749px) {
+    .gf-promo { --gf-promo-mobile-ink: #6b219a; --gf-promo-mobile-border: #e5c5f5; }
+    .gf-promo::after { content: ""; display: block; height: calc(var(--gf-promo-bar-height, 72px) + 24px + env(safe-area-inset-bottom, 0px)); }
+    .gf-promo__bar { position: fixed; left: 12px; right: 12px; bottom: calc(12px + env(safe-area-inset-bottom, 0px)); z-index: 2147482998; display: flex; align-items: center; min-height: 68px; overflow: hidden; color: var(--gf-promo-mobile-ink); background: linear-gradient(105deg, #f0dff9, #fcf8ff); border: 1px solid var(--gf-promo-mobile-border); border-radius: 18px; box-shadow: 0 4px 24px rgba(80, 25, 110, .18); }
+    .gf-promo__trigger { position: static; flex: 1; min-width: 0; min-height: 68px; max-width: none; align-items: center; color: inherit; background: none; border: 0; border-radius: 0; box-shadow: none; overflow: visible; transform: none; }
+    .gf-promo__gift { align-self: stretch; flex: 0 0 56px; width: 56px; color: #fff; background: linear-gradient(145deg, #ba43df, #8625b9); }
+    .gf-promo__trigger-copy { flex: 1; min-width: 0; gap: 3px; padding: 10px 8px 10px 12px; }
+    .gf-promo__trigger-copy strong { color: var(--gf-promo-mobile-ink); background: none; font-size: 16px; letter-spacing: 0; }
+    .gf-promo__trigger-copy > span { color: #542674; font-size: 12px; opacity: 1; }
+    .gf-promo__learn-more { display: inline-flex; flex: 0 0 auto; align-items: center; justify-content: center; min-height: 44px; padding: 8px 14px; color: var(--gf-promo-mobile-ink); background: #fff; border: 1px solid var(--gf-promo-mobile-border); border-radius: 999px; font-size: 12px; font-weight: 700; white-space: nowrap; }
+    .gf-promo__dismiss { display: grid; place-items: center; flex: 0 0 44px; width: 44px; min-height: 44px; margin: 0 2px; padding: 0; color: #382044; background: transparent; border: 0; cursor: pointer; }
+    .gf-promo__trigger:focus-visible, .gf-promo__dismiss:focus-visible { outline: 2px solid var(--gf-promo-mobile-ink); outline-offset: -3px; }
+    .gf-promo__overlay { align-items: end; justify-items: center; padding: 16px 16px calc(var(--gf-promo-bar-height, 72px) + 24px + env(safe-area-inset-bottom, 0px)); }
+    .gf-promo__dialog { grid-template-columns: 1fr; justify-items: center; gap: 14px; width: 100%; max-width: 570px; max-height: calc(100dvh - var(--gf-promo-bar-height, 72px) - 40px - env(safe-area-inset-bottom, 0px)); overflow-y: auto; padding: 22px 20px; text-align: center; border-radius: 20px; }
     .gf-promo__eyebrow { padding: 0 30px; }
     .gf-promo__offer { width: auto; min-width: 84px; padding: 10px 12px; }
     .gf-promo__offer strong { font-size: 26px; }
@@ -90,7 +111,7 @@
   @media (prefers-reduced-motion: no-preference) {
     .gf-promo__trigger { transition: transform .18s ease, box-shadow .18s ease; }
     .gf-promo__trigger:hover { transform: translateY(-2px); box-shadow: 0 15px 38px rgba(39,4,34,.34); }
-    @media (max-width: 600px) { .gf-promo__trigger:hover { transform: translateY(-2px); } }
+    @media (max-width: 749px) { .gf-promo__trigger:hover { transform: none; box-shadow: none; } }
   }
 </style>
 

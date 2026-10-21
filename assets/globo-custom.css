@@ -83,11 +83,9 @@ html:has(#gpf-demo) body::-webkit-scrollbar-thumb:hover{
     overflow: hidden;
     transition: max-width 0.35s cubic-bezier(0.4, 0, 0.2, 1);
 }
-.gpf-demo__storefront.page-wrapper[mode="mobile"]{
-    max-width: 430px;
-}
+.gpf-demo__storefront.page-wrapper[mode="mobile"],
 html[data-demo-device="mobile"] .gpf-demo__storefront.page-wrapper {
-    max-width: 430px;
+    /* max-width: 430px; */
 }
 html[data-demo-prepaint="true"] .gpf-demo__storefront.page-wrapper,
 html[data-demo-prepaint="true"] .gpf-demo-guide,

@@ -1,0 +1,330 @@
+{%- comment -%}
+  Globo offer bubble + coupon modal.
+  Fixed bubble (bottom-left/right). Click → modal with the discount code and a "Copy code" button.
+  Add it from the theme editor: Add section → "Offer bubble" (any template, header or footer group).
+  Position on the page doesn't matter — the bubble is position: fixed.
+{%- endcomment -%}
+
+{%- liquid
+  assign sid = section.id
+  assign code = section.settings.code | strip
+  assign position = section.settings.position
+  assign open_delay = section.settings.open_delay
+-%}
+
+{%- if section.settings.enabled and code != blank -%}
+<div
+  class="gob-root{% unless section.settings.show_on_mobile %} gob-hide-mobile{% endunless %}"
+  id="gob-{{ sid }}"
+  data-gob
+  data-code="{{ code | escape }}"
+  data-position="{{ position }}"
+  data-copied-text="{{ section.settings.copied_text | escape }}"
+  {% if open_delay > 0 and request.design_mode == false %}data-open-delay="{{ open_delay | times: 1000 }}"{% endif %}
+  style="--gob-brand: {{ section.settings.color_brand }}; --gob-brand-dark: {{ section.settings.color_brand_hover }}; --gob-offset-x: {{ section.settings.offset_x }}px; --gob-offset-y: {{ section.settings.offset_y }}px;"
+>
+  <button type="button" class="gob-bubble" aria-haspopup="dialog" aria-expanded="false" aria-controls="gob-dialog-{{ sid }}">
+    <span class="gob-bubble__icon" aria-hidden="true">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+        <rect x="3" y="8" width="18" height="4" rx="1"/>
+        <path d="M12 8v13"/>
+        <path d="M19 12v7a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2v-7"/>
+        <path d="M7.5 8a2.5 2.5 0 0 1 0-5C9.5 3 12 8 12 8s2.5-5 4.5-5a2.5 2.5 0 0 1 0 5"/>
+      </svg>
+    </span>
+    {%- if section.settings.label != blank -%}
+      <span class="gob-bubble__label">{{ section.settings.label | escape }}</span>
+    {%- endif -%}
+  </button>
+
+  <div class="gob-overlay" hidden>
+    <div class="gob-modal" id="gob-dialog-{{ sid }}" role="dialog" aria-modal="true" aria-labelledby="gob-title-{{ sid }}" tabindex="-1">
+      <button type="button" class="gob-close" aria-label="{{ section.settings.close_label | escape }}">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M6 6l12 12M18 6L6 18"/></svg>
+      </button>
+      <h2 class="gob-title" id="gob-title-{{ sid }}">{{ section.settings.title }}</h2>
+      <div class="gob-coupon">
+        <span class="gob-code">{{ code | escape }}</span>
+        <button type="button" class="gob-copy">{{ section.settings.copy_text | escape }}</button>
+      </div>
+      {%- if section.settings.note != blank -%}
+        <p class="gob-note">{{ section.settings.note }}</p>
+      {%- endif -%}
+      {%- if section.settings.cta_text != blank and section.settings.cta_url != blank -%}
+        <a class="gob-cta" href="{{ section.settings.cta_url }}"{% if section.settings.cta_new_tab %} target="_blank" rel="noopener"{% endif %}>{{ section.settings.cta_text | escape }}</a>
+      {%- endif -%}
+    </div>
+  </div>
+</div>
+{%- endif -%}
+
+{%- comment -%} Shared CSS/JS: printed once per page by Shopify (bundled), even with several instances. {%- endcomment -%}
+{% stylesheet %}
+.gob-root {
+  --gob-brand: #8b0d1a;
+  --gob-brand-dark: #6b0712;
+  --gob-text: #303030;
+  --gob-muted: #6d6d6d;
+  --gob-surface: #ffffff;
+  --gob-overlay: rgba(0, 0, 0, .45);
+  --gob-radius: 14px;
+  --gob-z: 2147483000;
+  --gob-offset-x: 16px;
+  --gob-offset-y: 16px;
+  --gob-font: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
+}
+.gob-root, .gob-root *, .gob-root *::before, .gob-root *::after { box-sizing: border-box; }
+.gob-root [hidden] { display: none !important; }
+.gob-overlay[hidden] { display: none !important; }
+
+.gob-bubble {
+  position: fixed; left: var(--gob-offset-x); bottom: var(--gob-offset-y); z-index: var(--gob-z);
+  display: flex; align-items: center; gap: 14px;
+  margin: 0; padding: 0; border: 0; background: none; box-shadow: none; min-height: 0; min-width: 0;
+  cursor: pointer; font-family: var(--gob-font); text-decoration: none;
+  -webkit-tap-highlight-color: transparent; animation: gob-in .4s ease-out both;
+}
+.gob-bubble::before, .gob-bubble::after { content: none; display: none; }
+.gob-root[data-position="right"] .gob-bubble { left: auto; right: var(--gob-offset-x); flex-direction: row-reverse; }
+
+.gob-bubble__icon {
+  flex: none; display: grid; place-items: center; width: 56px; height: 56px; border-radius: 50%;
+  background: var(--gob-surface); color: var(--gob-brand);
+  box-shadow: 0 4px 14px rgba(0, 0, 0, .18); transition: transform .15s ease;
+}
+.gob-bubble__icon svg { width: 30px; height: 30px; display: block; }
+
+.gob-bubble__label {
+  position: relative; display: inline-flex; align-items: center; min-height: 48px; padding: 12px 22px;
+  border-radius: 10px; background: var(--gob-brand); color: #fff;
+  font-family: var(--gob-font); font-size: 15px; line-height: 20px; font-weight: 800;
+  letter-spacing: .02em; text-transform: uppercase; white-space: nowrap;
+  box-shadow: 0 6px 18px rgba(0, 0, 0, .25); transition: background .15s ease;
+}
+.gob-bubble__label::before {
+  content: ""; position: absolute; left: -7px; top: 50%; width: 14px; height: 14px; margin-top: -7px;
+  background: inherit; transform: rotate(45deg); border-radius: 2px;
+}
+.gob-root[data-position="right"] .gob-bubble__label::before { left: auto; right: -7px; }
+.gob-bubble:hover .gob-bubble__icon { transform: scale(1.06); }
+.gob-bubble:hover .gob-bubble__label { background: var(--gob-brand-dark); }
+.gob-bubble:focus { outline: none; }
+.gob-bubble:focus-visible .gob-bubble__label { outline: 3px solid #fff; box-shadow: 0 0 0 5px var(--gob-brand); }
+
+.gob-overlay {
+  position: fixed; inset: 0; z-index: calc(var(--gob-z) + 1);
+  display: flex; align-items: center; justify-content: center; padding: 16px;
+  background: var(--gob-overlay); font-family: var(--gob-font); animation: gob-fade .2s ease-out both;
+}
+.gob-modal {
+  position: relative; width: 100%; max-width: 560px; margin: 0; padding: 36px 40px 28px;
+  border-radius: var(--gob-radius); background: var(--gob-surface); color: var(--gob-text);
+  text-align: center; box-shadow: 0 20px 60px rgba(0, 0, 0, .3); animation: gob-pop .22s ease-out both;
+}
+.gob-close {
+  position: absolute; top: 12px; right: 12px; display: grid; place-items: center;
+  width: 36px; height: 36px; min-width: 0; min-height: 0; margin: 0; padding: 0;
+  border: 0; border-radius: 8px; background: none; box-shadow: none; color: var(--gob-brand); cursor: pointer;
+}
+.gob-close::before, .gob-close::after { content: none; display: none; }
+.gob-close:hover { background: rgba(0, 0, 0, .06); }
+.gob-close:focus-visible { outline: 2px solid var(--gob-brand); outline-offset: 1px; }
+.gob-close svg { width: 22px; height: 22px; display: block; }
+
+.gob-title {
+  margin: 0 24px 24px; padding: 0; color: var(--gob-brand);
+  font-family: var(--gob-font); font-size: 22px; line-height: 30px; font-weight: 800; letter-spacing: .01em; text-transform: none;
+}
+.gob-coupon {
+  display: flex; align-items: center; gap: 12px; padding: 10px 10px 10px 24px;
+  border: 2px dashed var(--gob-brand); border-radius: 4px;
+}
+.gob-code {
+  flex: 1; min-width: 0; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; text-align: left;
+  color: var(--gob-brand); font-family: var(--gob-font); font-size: 26px; line-height: 36px; font-weight: 500;
+  letter-spacing: .02em; user-select: all; -webkit-user-select: all;
+}
+.gob-copy {
+  flex: none; min-width: 128px; min-height: 0; margin: 0; padding: 12px 18px;
+  border: 0; border-radius: 2px; background: var(--gob-brand); color: #fff; box-shadow: none;
+  font-family: var(--gob-font); font-size: 17px; line-height: 22px; font-weight: 800; letter-spacing: .02em;
+  text-transform: none; cursor: pointer; transition: background .15s ease;
+}
+.gob-copy::before, .gob-copy::after { content: none; display: none; }
+.gob-copy:hover { background: var(--gob-brand-dark); }
+.gob-copy:focus-visible { outline: 2px solid var(--gob-brand); outline-offset: 2px; }
+.gob-copy.is-copied { background: #1f7a4d; }
+
+.gob-note { margin: 16px 0 0; color: var(--gob-muted); font-family: var(--gob-font); font-size: 13px; line-height: 20px; }
+.gob-note p { margin: 0; }
+.gob-cta {
+  display: inline-block; margin-top: 20px; padding: 12px 22px; border-radius: 8px;
+  background: var(--gob-brand); color: #fff; font-family: var(--gob-font);
+  font-size: 15px; line-height: 20px; font-weight: 700; text-decoration: none;
+}
+.gob-cta:hover { background: var(--gob-brand-dark); color: #fff; }
+
+@media (max-width: 560px) {
+  .gob-hide-mobile { display: none !important; }
+  .gob-bubble__icon { width: 48px; height: 48px; }
+  .gob-bubble__icon svg { width: 26px; height: 26px; }
+  .gob-bubble__label { min-height: 42px; padding: 10px 16px; font-size: 13px; }
+  .gob-modal { padding: 32px 20px 22px; }
+  .gob-title { margin: 0 16px 20px; font-size: 18px; line-height: 26px; }
+  .gob-coupon { flex-direction: column; align-items: stretch; padding: 12px; }
+  .gob-code { text-align: center; font-size: 22px; }
+  .gob-copy { width: 100%; }
+}
+@keyframes gob-in   { from { opacity: 0; transform: translateY(12px); } to { opacity: 1; transform: none; } }
+@keyframes gob-fade { from { opacity: 0; } to { opacity: 1; } }
+@keyframes gob-pop  { from { opacity: 0; transform: translateY(8px) scale(.98); } to { opacity: 1; transform: none; } }
+@media (prefers-reduced-motion: reduce) { .gob-bubble, .gob-overlay, .gob-modal { animation: none; } }
+{% endstylesheet %}
+
+{% javascript %}
+(function () {
+  "use strict";
+  if (window.GloboOfferBubble) return;
+  var SESSION_KEY = "gob_auto_opened";
+
+  function copyText(text) {
+    if (navigator.clipboard && window.isSecureContext) return navigator.clipboard.writeText(text);
+    return new Promise(function (resolve, reject) {
+      var ta = document.createElement("textarea");
+      ta.value = text; ta.setAttribute("readonly", "");
+      ta.style.cssText = "position:fixed;top:-1000px;left:-1000px;opacity:0";
+      document.body.appendChild(ta); ta.select();
+      try { document.execCommand("copy") ? resolve() : reject(new Error("copy failed")); }
+      catch (e) { reject(e); } finally { document.body.removeChild(ta); }
+    });
+  }
+  function sGet(k) { try { return window.sessionStorage.getItem(k); } catch (e) { return null; } }
+  function sSet(k, v) { try { window.sessionStorage.setItem(k, v); } catch (e) {} }
+
+  function init(root) {
+    if (!root || root.__gob) return root && root.__gob;
+    var bubble = root.querySelector(".gob-bubble"), overlay = root.querySelector(".gob-overlay"),
+        modal = root.querySelector(".gob-modal"), closeBt = root.querySelector(".gob-close"),
+        copyBt = root.querySelector(".gob-copy"), codeEl = root.querySelector(".gob-code");
+    if (!bubble || !overlay || !modal) return null;
+
+    var code = root.getAttribute("data-code") || (codeEl ? codeEl.textContent.trim() : "");
+    var copyLabel = copyBt ? copyBt.textContent : "";
+    var copiedLabel = root.getAttribute("data-copied-text") || "Copied!";
+    var lastFocus = null, resetTimer = null;
+
+    // Move to <body>: a theme wrapper with transform/filter/overflow would otherwise break position: fixed.
+    if (root.parentNode !== document.body) document.body.appendChild(root);
+
+    function focusables() { return modal.querySelectorAll('button, a[href], [tabindex]:not([tabindex="-1"])'); }
+    function onKey(e) {
+      if (e.key === "Escape" || e.key === "Esc") { close(); return; }
+      if (e.key === "Tab") {
+        var f = focusables(); if (!f.length) return;
+        var first = f[0], last = f[f.length - 1];
+        if (e.shiftKey && document.activeElement === first) { e.preventDefault(); last.focus(); }
+        else if (!e.shiftKey && document.activeElement === last) { e.preventDefault(); first.focus(); }
+      }
+    }
+    function open() {
+      if (!overlay.hidden) return;
+      lastFocus = document.activeElement;
+      overlay.hidden = false;
+      bubble.setAttribute("aria-expanded", "true");
+      document.addEventListener("keydown", onKey, true);
+      (copyBt || closeBt || modal).focus();
+    }
+    function close() {
+      if (overlay.hidden) return;
+      overlay.hidden = true;
+      bubble.setAttribute("aria-expanded", "false");
+      document.removeEventListener("keydown", onKey, true);
+      if (lastFocus && lastFocus.focus) lastFocus.focus();
+    }
+    function destroy() { close(); root.__gob = null; if (root.parentNode) root.parentNode.removeChild(root); }
+
+    bubble.addEventListener("click", open);
+    if (closeBt) closeBt.addEventListener("click", close);
+    overlay.addEventListener("click", function (e) { if (e.target === overlay) close(); });
+    if (copyBt) copyBt.addEventListener("click", function () {
+      copyText(code).then(function () {
+        copyBt.textContent = copiedLabel; copyBt.classList.add("is-copied");
+      }, function () {
+        if (codeEl && window.getSelection) {
+          var r = document.createRange(); r.selectNodeContents(codeEl);
+          var s = window.getSelection(); s.removeAllRanges(); s.addRange(r);
+        }
+      });
+      clearTimeout(resetTimer);
+      resetTimer = setTimeout(function () { copyBt.textContent = copyLabel; copyBt.classList.remove("is-copied"); }, 2000);
+    });
+
+    var delay = parseInt(root.getAttribute("data-open-delay"), 10);
+    if (!isNaN(delay) && !sGet(SESSION_KEY)) setTimeout(function () { sSet(SESSION_KEY, "1"); open(); }, Math.max(0, delay));
+
+    root.__gob = { open: open, close: close, destroy: destroy };
+    return root.__gob;
+  }
+
+  function initAll(scope) {
+    var roots = (scope || document).querySelectorAll("[data-gob]");
+    for (var i = 0; i < roots.length; i++) init(roots[i]);
+  }
+
+  window.GloboOfferBubble = {
+    init: initAll,
+    open: function () { var g = init(document.querySelector("[data-gob]")); g && g.open(); },
+    close: function () { var r = document.querySelector("[data-gob]"); r && r.__gob && r.__gob.close(); }
+  };
+
+  if (document.readyState === "loading") document.addEventListener("DOMContentLoaded", function () { initAll(); });
+  else initAll();
+
+  // Theme editor. The root lives in <body> (moved by init), so find it by section id.
+  function bySection(e) { return e.detail && document.getElementById("gob-" + e.detail.sectionId); }
+  document.addEventListener("shopify:section:load", function (e) { initAll(e.target); });
+  document.addEventListener("shopify:section:unload", function (e) {
+    var r = bySection(e); r && (r.__gob ? r.__gob.destroy() : r.parentNode && r.parentNode.removeChild(r));
+  });
+  document.addEventListener("shopify:section:select", function (e) { var g = init(bySection(e)); g && g.open(); });
+  document.addEventListener("shopify:section:deselect", function (e) { var r = bySection(e); r && r.__gob && r.__gob.close(); });
+})();
+{% endjavascript %}
+
+{% schema %}
+{
+  "name": "Offer bubble",
+  "tag": "div",
+  "class": "gob-section",
+  "settings": [
+    { "type": "checkbox", "id": "enabled", "label": "Show offer bubble", "default": true },
+    { "type": "header", "content": "Bubble" },
+    { "type": "text", "id": "label", "label": "Bubble text", "default": "Get 50% off first 2 months" },
+    {
+      "type": "select", "id": "position", "label": "Position", "default": "left",
+      "options": [ { "value": "left", "label": "Bottom left" }, { "value": "right", "label": "Bottom right" } ]
+    },
+    { "type": "range", "id": "offset_x", "label": "Side spacing", "min": 0, "max": 60, "step": 2, "unit": "px", "default": 16 },
+    { "type": "range", "id": "offset_y", "label": "Bottom spacing", "min": 0, "max": 120, "step": 4, "unit": "px", "default": 16 },
+    { "type": "checkbox", "id": "show_on_mobile", "label": "Show on mobile", "default": true },
+    {
+      "type": "range", "id": "open_delay", "label": "Auto-open modal after", "min": 0, "max": 30, "step": 1, "unit": "s", "default": 0,
+      "info": "0 = only open on click. Auto-open happens once per browser session."
+    },
+    { "type": "header", "content": "Modal" },
+    { "type": "text", "id": "code", "label": "Discount code", "default": "DEMOFILTER" },
+    { "type": "inline_richtext", "id": "title", "label": "Heading", "default": "Apply this code on the Pricing page to get 50% OFF your first 2 months!" },
+    { "type": "inline_richtext", "id": "note", "label": "Note", "default": "For new stores · monthly plans" },
+    { "type": "text", "id": "copy_text", "label": "Copy button text", "default": "Copy code" },
+    { "type": "text", "id": "copied_text", "label": "Copied text", "default": "Copied!" },
+    { "type": "text", "id": "close_label", "label": "Close button label (screen readers)", "default": "Close" },
+    { "type": "text", "id": "cta_text", "label": "Button text (optional)" },
+    { "type": "url", "id": "cta_url", "label": "Button link" },
+    { "type": "checkbox", "id": "cta_new_tab", "label": "Open link in new tab", "default": true },
+    { "type": "header", "content": "Colors" },
+    { "type": "color", "id": "color_brand", "label": "Main color", "default": "#8b0d1a" },
+    { "type": "color", "id": "color_brand_hover", "label": "Hover color", "default": "#6b0712" }
+  ],
+  "presets": [ { "name": "Offer bubble" } ]
+}
+{% endschema %}

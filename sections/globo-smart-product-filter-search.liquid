@@ -1,0 +1,1038 @@
+{%- comment -%}
+  Globo – Smart Product Filter & Search: Pricing plans (design: Option A, Polaris colours)
+
+  1. Pricing – Shopify / Shopify Plus switch + product-count slider + 2 plan cards + free-trial bar
+  2. Full list of features – collapsible groups with a sticky Basic / Professional header
+
+  All CSS is scoped under .gsf-page, JS is vanilla (no jQuery, no slider library).
+  Fonts are served from the theme assets/ folder (gsf-Switzer-*.woff2 / .woff).
+  Pricing data: GSF_PRICING in the <script> at the bottom (same tiers and prices as globo.io).
+{%- endcomment -%}
+
+{%- assign gsf_pricing_url = 'https://apps.shopify.com/product-filter-and-search#adp-pricing' -%}
+{%- assign gsf_trial_url = 'https://apps.shopify.com/product-filter-and-search?utm_source=globosoftware.net&utm_medium=pricing-page&utm_campaign=globosoftware.net&utm_content=try-free-now-button' -%}
+{%- assign gsf_top_desktop = section.settings.sticky_top | default: 0 -%}
+{%- assign gsf_top_mobile = section.settings.sticky_top_mobile | default: 0 -%}
+
+<style>
+  /* ---------- Fonts (Switzer – theme assets) ---------- */
+  @font-face { font-family: 'Switzer'; src: url('{{ 'gsf-Switzer-Regular.woff2' | asset_url }}') format('woff2'), url('{{ 'gsf-Switzer-Regular.woff' | asset_url }}') format('woff'); font-weight: 400; font-style: normal; font-display: swap; }
+  @font-face { font-family: 'Switzer'; src: url('{{ 'gsf-Switzer-Medium.woff2' | asset_url }}') format('woff2'), url('{{ 'gsf-Switzer-Medium.woff' | asset_url }}') format('woff'); font-weight: 500; font-style: normal; font-display: swap; }
+  @font-face { font-family: 'Switzer'; src: url('{{ 'gsf-Switzer-Semibold.woff2' | asset_url }}') format('woff2'), url('{{ 'gsf-Switzer-Semibold.woff' | asset_url }}') format('woff'); font-weight: 600; font-style: normal; font-display: swap; }
+  @font-face { font-family: 'Switzer'; src: url('{{ 'gsf-Switzer-Bold.woff2' | asset_url }}') format('woff2'), url('{{ 'gsf-Switzer-Bold.woff' | asset_url }}') format('woff'); font-weight: 700; font-style: normal; font-display: swap; }
+
+  /* ---------- Tokens (Polaris light theme) ---------- */
+  body.template--page-smart-filter .gpf-demo__storefront.page-wrapper {
+    max-width: 100%;
+    border-radius: 0;
+  }
+  body.template--page-smart-filter .gpf-demo__viewport {
+    padding-left: 0;
+    padding-right: 0;
+  }
+  .gsf-page {
+    --gsf-ink: #303030;
+    --gsf-ink-2: #616161;
+    --gsf-ink-3: #8A8A8A;
+    --gsf-bg: #F1F1F1;
+    --gsf-panel: #F7F7F7;
+    --gsf-surface: #FFFFFF;
+    --gsf-border: #E3E3E3;
+    --gsf-border-2: #EBEBEB;
+    --gsf-border-strong: #CCCCCC;
+    --gsf-fill-brand: #303030;
+    --gsf-fill-brand-hover: #1A1A1A;
+    --gsf-dark: #1A1A1A;
+    --gsf-link: #005BD3;
+    --gsf-link-hover: #004299;
+    --gsf-focus: #005BD3;
+    --gsf-success: #047B5D;
+    --gsf-success-on-dark: #92FCAC;
+    --gsf-magic: #5700D1;
+    --gsf-magic-bg: #E9E5FF;
+    --gsf-star: #FFB800;
+    --gsf-radius-card: 24px;
+    --gsf-top-manual: {{ gsf_top_desktop }}px;
+    font-family: 'Switzer', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+    font-size: 16px;
+    font-weight: 400;
+    line-height: 1.6;
+    color: var(--gsf-ink);
+    background: var(--gsf-surface);
+    letter-spacing: 0;
+    -webkit-font-smoothing: antialiased;
+    overflow-x: clip;
+  }
+  @media (max-width: 767px) {
+    .gsf-page { --gsf-top-manual: {{ gsf_top_mobile }}px; }
+  }
+
+  /* ---------- Scoped reset ---------- */
+  .gsf-page *, .gsf-page *::before, .gsf-page *::after { box-sizing: border-box; }
+  .gsf-page h1, .gsf-page h2, .gsf-page h3, .gsf-page h4, .gsf-page p, .gsf-page figure, .gsf-page blockquote { margin: 0; }
+  .gsf-page h1, .gsf-page h2, .gsf-page h3, .gsf-page h4 {
+    font-family: inherit;
+    color: var(--gsf-ink);
+    font-weight: 700;
+    letter-spacing: -0.015em;
+    text-transform: none;
+  }
+  .gsf-page ul { list-style: none; margin: 0; padding: 0; }
+  .gsf-page img { display: block; max-width: 100%; height: auto; border: 0; }
+  .gsf-page a { color: var(--gsf-link); text-decoration: none; transition: color .15s, background-color .15s, border-color .15s; }
+  .gsf-page a:hover { color: var(--gsf-link-hover); }
+  .gsf-page button {
+    font: inherit; color: inherit; background: none; border: 0; margin: 0; padding: 0;
+    cursor: pointer; text-align: inherit; letter-spacing: inherit; text-transform: none;
+    box-shadow: none; min-height: 0; min-width: 0; border-radius: 0;
+  }
+  .gsf-page :focus-visible { outline: 2px solid var(--gsf-focus); outline-offset: 2px; }
+  .gsf-page [hidden] { display: none !important; }
+  .gsf-page svg { flex: 0 0 auto; }
+
+  .gsf-container { width: 100%; max-width: 1248px; margin: 0 auto; padding: 0 28px; }
+  @media (max-width: 767px) { .gsf-container { padding: 0 20px; } }
+
+  /* ---------- Typography helpers ---------- */
+  .gsf-eyebrow {
+    display: block;
+    margin-bottom: 12px;
+    font-size: 14px;
+    font-weight: 600;
+    letter-spacing: 0.08em;
+    text-transform: uppercase;
+    color: var(--gsf-success);
+  }
+  .gsf-page .gsf-h2 { font-size: 44px; line-height: 1.15; }
+  .gsf-lead { font-size: 20px; line-height: 1.55; color: var(--gsf-ink-2); }
+  .gsf-section-head { text-align: center; max-width: 720px; margin: 0 auto 48px; }
+  .gsf-section-head .gsf-h2 { margin-bottom: 12px; }
+  @media (max-width: 1024px) { .gsf-page .gsf-h2 { font-size: 36px; } }
+  @media (max-width: 767px) {
+    .gsf-page .gsf-h2 { font-size: 30px; }
+    .gsf-lead { font-size: 17px; }
+    .gsf-eyebrow { font-size: 13px; margin-bottom: 8px; }
+    .gsf-section-head { text-align: left; margin-bottom: 24px; }
+  }
+
+  /* ---------- Buttons ---------- */
+  .gsf-page .gsf-btn {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    gap: 8px;
+    height: 52px;
+    padding: 0 24px;
+    border-radius: 999px;
+    border: 1.5px solid transparent;
+    font-size: 16px;
+    font-weight: 600;
+    line-height: 1;
+    white-space: nowrap;
+    text-decoration: none;
+    transition: background-color .15s, border-color .15s, color .15s, box-shadow .15s;
+  }
+  .gsf-page .gsf-btn--primary {
+    background: var(--gsf-fill-brand);
+    color: #fff;
+    box-shadow: inset 0 1px 0 rgba(255, 255, 255, .18), inset 0 -2px 0 rgba(0, 0, 0, .55);
+  }
+  .gsf-page .gsf-btn--primary:hover { background: var(--gsf-fill-brand-hover); color: #fff; }
+  .gsf-page .gsf-btn--secondary { background: var(--gsf-surface); color: var(--gsf-ink); border-color: var(--gsf-border-strong); }
+  .gsf-page .gsf-btn--secondary:hover { background: var(--gsf-panel); color: var(--gsf-ink); border-color: #B5B5B5; }
+  .gsf-page .gsf-btn--light { background: #fff; color: var(--gsf-dark); }
+  .gsf-page .gsf-btn--light:hover { background: #E3E3E3; color: var(--gsf-dark); }
+  .gsf-page .gsf-btn--sm { height: 40px; padding: 0 18px; font-size: 15px; }
+  .gsf-page .gsf-btn--block { display: flex; width: 100%; }
+
+  /* ---------- Reveal on scroll ---------- */
+  .gsf-reveal { opacity: 0; transform: translateY(16px); transition: opacity .6s ease, transform .6s ease; }
+  .gsf-reveal.is-on { opacity: 1; transform: none; }
+  @media (prefers-reduced-motion: reduce) {
+    .gsf-reveal { opacity: 1; transform: none; transition: none; }
+    .gsf-page * { scroll-behavior: auto !important; }
+  }
+
+  /* =========================================================
+     1. PRICING
+     ========================================================= */
+  .gsf-pricing { background: var(--gsf-bg); padding: 96px 0; }
+  .gsf-segment { display: inline-flex; padding: 4px; background: var(--gsf-border); border-radius: 999px; margin-top: 28px; }
+  .gsf-page .gsf-segment__btn {
+    height: 44px;
+    padding: 0 22px;
+    border-radius: 999px;
+    color: var(--gsf-ink-2);
+    font-weight: 500;
+    transition: background-color .15s, color .15s;
+  }
+  .gsf-page .gsf-segment__btn[aria-selected="true"] { background: var(--gsf-surface); color: var(--gsf-ink); font-weight: 600; box-shadow: 0 1px 3px rgba(26, 26, 26, .15); }
+
+  .gsf-slider-card {
+    background: var(--gsf-surface);
+    border: 1px solid var(--gsf-border);
+    border-radius: var(--gsf-radius-card);
+    padding: 32px 40px 24px;
+    margin-bottom: 24px;
+  }
+  .gsf-slider-card__head { display: flex; justify-content: space-between; align-items: flex-end; gap: 16px; margin-bottom: 20px; }
+  .gsf-slider-card__label { font-size: 18px; font-weight: 600; }
+  .gsf-slider-card__value { font-size: 32px; font-weight: 700; line-height: 1; white-space: nowrap; font-variant-numeric: tabular-nums; }
+  .gsf-slider-card__value small { font-size: 18px; font-weight: 500; color: var(--gsf-ink-2); }
+
+  /* native range slider */
+  .gsf-range-wrap { --thumb: 28px; position: relative; padding-bottom: 32px; }
+  .gsf-page .gsf-range {
+    -webkit-appearance: none;
+    appearance: none;
+    display: block;
+    width: 100%;
+    height: var(--thumb);
+    margin: 0;
+    padding: 0;
+    background: transparent;
+    border: 0;
+    cursor: pointer;
+    --gsf-fill: 0%;
+  }
+  .gsf-range:focus { outline: none; }
+  .gsf-range::-webkit-slider-runnable-track {
+    height: 6px;
+    border-radius: 999px;
+    background: linear-gradient(to right, var(--gsf-ink) 0, var(--gsf-ink) var(--gsf-fill), var(--gsf-border) var(--gsf-fill), var(--gsf-border) 100%);
+  }
+  .gsf-range::-webkit-slider-thumb {
+    -webkit-appearance: none;
+    appearance: none;
+    width: var(--thumb);
+    height: var(--thumb);
+    margin-top: calc((6px - var(--thumb)) / 2);
+    border-radius: 50%;
+    background: #fff;
+    border: 3px solid var(--gsf-ink);
+    box-shadow: 0 2px 8px rgba(26, 26, 26, .3);
+  }
+  .gsf-range::-moz-range-track { height: 6px; border-radius: 999px; background: var(--gsf-border); }
+  .gsf-range::-moz-range-progress { height: 6px; border-radius: 999px; background: var(--gsf-ink); }
+  .gsf-range::-moz-range-thumb {
+    width: var(--thumb);
+    height: var(--thumb);
+    box-sizing: border-box;
+    border-radius: 50%;
+    background: #fff;
+    border: 3px solid var(--gsf-ink);
+    box-shadow: 0 2px 8px rgba(26, 26, 26, .3);
+  }
+  .gsf-range:focus-visible::-webkit-slider-thumb { outline: 2px solid var(--gsf-focus); outline-offset: 2px; }
+  .gsf-range:focus-visible::-moz-range-thumb { outline: 2px solid var(--gsf-focus); outline-offset: 2px; }
+  .gsf-range-labels { position: absolute; left: 0; right: 0; bottom: 0; height: 24px; }
+  .gsf-page .gsf-range-label {
+    position: absolute;
+    top: 0;
+    left: calc(var(--thumb) / 2 + (100% - var(--thumb)) * var(--p));
+    transform: translateX(-50%);
+    font-size: 14px;
+    line-height: 24px;
+    color: var(--gsf-ink-3);
+    white-space: nowrap;
+    font-variant-numeric: tabular-nums;
+  }
+  .gsf-page .gsf-range-label:hover { color: var(--gsf-ink); }
+  .gsf-page .gsf-range-label.is-active { color: var(--gsf-ink); font-weight: 600; }
+  @media (max-width: 1199px) { .gsf-page .gsf-range-label { font-size: 13px; } }
+  .gsf-range-label--first { transform: translateX(calc(-1 * var(--thumb) / 2)) !important; }
+  .gsf-range-label--last { transform: translateX(calc(-100% + var(--thumb) / 2)) !important; }
+
+  .gsf-plans { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 24px; align-items: start; }
+  .gsf-plan {
+    position: relative;
+    display: flex;
+    flex-direction: column;
+    gap: 20px;
+    padding: 32px;
+    height: 100%;
+    background: var(--gsf-surface);
+    border: 1px solid var(--gsf-border);
+    border-radius: var(--gsf-radius-card);
+  }
+  .gsf-plan--pro { border: 2px solid var(--gsf-ink); box-shadow: 0 24px 48px -24px rgba(26, 26, 26, .35); }
+  .gsf-plan__badge {
+    position: absolute;
+    top: -14px;
+    left: 32px;
+    padding: 4px 12px;
+    border-radius: 999px;
+    background: var(--gsf-ink);
+    color: #fff;
+    font-size: 13px;
+    font-weight: 600;
+    line-height: 1.4;
+  }
+  .gsf-plan__name { font-size: 22px; font-weight: 700; line-height: 1.3; }
+  .gsf-plan__desc { color: var(--gsf-ink-2); }
+  .gsf-plan__price { display: flex; align-items: baseline; gap: 6px; }
+  .gsf-plan__amount { font-size: 52px; font-weight: 700; line-height: 1; letter-spacing: -0.02em; font-variant-numeric: tabular-nums; }
+  .gsf-plan__per { color: var(--gsf-ink-2); }
+  .gsf-plan__yearly { margin-top: 8px; font-size: 15px; color: var(--gsf-ink-2); font-variant-numeric: tabular-nums; }
+  .gsf-save { color: var(--gsf-success); font-weight: 600; }
+  .gsf-plan__divider { height: 1px; background: var(--gsf-border); }
+  .gsf-plan__plus { font-size: 14px; font-weight: 600; letter-spacing: 0.06em; text-transform: uppercase; color: var(--gsf-ink-2); }
+  .gsf-checklist { display: flex; flex-direction: column; gap: 12px; }
+  .gsf-checklist li { display: flex; gap: 12px; align-items: flex-start; }
+  .gsf-checklist svg { margin-top: 3px; color: var(--gsf-success); }
+  .gsf-page .gsf-plan__more-btn { display: none; }
+
+  .gsf-trial-bar {
+    margin-top: 24px;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 24px;
+    padding: 24px 32px;
+    border-radius: 20px;
+    background: var(--gsf-ink);
+    color: #fff;
+  }
+  .gsf-trial-bar__text { font-size: 20px; font-weight: 600; }
+  @media (max-width: 1024px) {
+    .gsf-slider-card { padding: 24px 24px 20px; }
+    .gsf-plan { padding: 28px 24px; }
+    .gsf-range-label--d { display: none; }
+  }
+  @media (max-width: 767px) {
+    .gsf-pricing { padding: 48px 0; }
+    .gsf-segment { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); width: 100%; margin-top: 20px; }
+    .gsf-slider-card { padding: 20px 20px 16px; border-radius: 20px; margin-bottom: 16px; }
+    .gsf-slider-card__head { flex-direction: column; align-items: flex-start; gap: 4px; margin-bottom: 14px; }
+    .gsf-slider-card__label { font-size: 15px; color: var(--gsf-ink-2); }
+    .gsf-slider-card__value { font-size: 30px; }
+    .gsf-slider-card__value small { font-size: 16px; }
+    .gsf-range-wrap { --thumb: 32px; }
+    .gsf-page .gsf-range { height: 44px; }
+    .gsf-range-label--t { display: none; }
+    .gsf-plans { grid-template-columns: minmax(0, 1fr); gap: 16px; }
+    .gsf-plan { padding: 24px 20px 20px; border-radius: 20px; gap: 16px; }
+    .gsf-plan--pro { order: -1; }
+    .gsf-plan__badge { left: 20px; top: -13px; font-size: 12px; }
+    .gsf-plan__name { font-size: 20px; }
+    .gsf-plan__amount { font-size: 42px; }
+    .gsf-checklist { gap: 10px; font-size: 15px; }
+    .gsf-plan__divider { display: none; }
+    .gsf-plan:not(.is-expanded) .gsf-checklist__more { display: none; }
+    .gsf-page .gsf-plan__more-btn {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 6px;
+      height: 44px;
+      margin-top: -6px;
+      font-size: 15px;
+      font-weight: 600;
+      color: var(--gsf-link);
+    }
+    .gsf-plan.is-expanded .gsf-plan__more-btn svg { transform: rotate(180deg); }
+    .gsf-trial-bar { flex-direction: column; align-items: stretch; text-align: center; gap: 14px; padding: 22px 20px; margin-top: 16px; }
+    .gsf-trial-bar__text { font-size: 18px; }
+    .gsf-trial-bar .gsf-btn { width: 100%; }
+  }
+
+  /* =========================================================
+     2. FULL LIST OF FEATURES
+     ========================================================= */
+  .gsf-compare { padding: 96px 0 35px 0; }
+  .gsf-compare__head { display: flex; justify-content: space-between; align-items: flex-end; gap: 16px; margin-bottom: 28px; }
+  .gsf-compare__table { position: relative; }
+  .gsf-ct-row { display: grid; grid-template-columns: minmax(0, 2fr) repeat(2, minmax(0, 1fr)); }
+  .gsf-ct-header {
+    position: sticky;
+    top: var(--gsf-top, var(--gsf-top-manual));
+    z-index: 15;
+    background: var(--gsf-surface);
+    border: 1px solid var(--gsf-border);
+    border-radius: 16px 16px 0 0;
+    box-shadow: 0 8px 24px -16px rgba(26, 26, 26, .25);
+    transition: top .2s ease;
+  }
+  .gsf-ct-header__caption { padding: 20px 24px; display: flex; align-items: center; color: var(--gsf-ink-2); font-size: 15px; }
+  .gsf-ct-header__plan { padding: 16px; border-left: 1px solid var(--gsf-border); display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 8px; }
+  .gsf-ct-header__plan--pro { background: var(--gsf-panel); }
+  .gsf-ct-header__name { font-size: 18px; font-weight: 700; }
+  .gsf-page .gsf-ct-header__btn {
+    display: inline-flex;
+    align-items: center;
+    height: 34px;
+    padding: 0 14px;
+    border-radius: 999px;
+    border: 1px solid var(--gsf-border-strong);
+    color: var(--gsf-ink);
+    font-size: 14px;
+    font-weight: 600;
+    white-space: nowrap;
+  }
+  .gsf-page .gsf-ct-header__btn:hover { background: var(--gsf-panel); color: var(--gsf-ink); }
+  .gsf-page .gsf-ct-header__btn--primary { background: var(--gsf-ink); border-color: var(--gsf-ink); color: #fff; }
+  .gsf-page .gsf-ct-header__btn--primary:hover { background: var(--gsf-fill-brand-hover); color: #fff; }
+  .gsf-ct-body { border: 1px solid var(--gsf-border); border-top: 0; border-radius: 0 0 16px 16px; overflow: hidden; }
+  .gsf-page .gsf-ct-group__toggle {
+    width: 100%;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 12px;
+    min-height: 60px;
+    padding: 16px 24px;
+    background: var(--gsf-surface);
+    border-bottom: 1px solid var(--gsf-border);
+    text-align: left;
+    transition: background-color .15s;
+  }
+  .gsf-page .gsf-ct-group__toggle:hover { background: var(--gsf-panel); }
+  .gsf-page .gsf-ct-group__toggle[aria-expanded="true"] { background: var(--gsf-bg); }
+  .gsf-ct-group__title { font-size: 18px; font-weight: 700; }
+  .gsf-ct-group__count { font-size: 15px; font-weight: 500; color: var(--gsf-ink-2); }
+  .gsf-ct-group__toggle svg { transition: transform .2s ease; }
+  .gsf-ct-group__toggle[aria-expanded="true"] svg { transform: rotate(180deg); }
+  .gsf-ct-group__panel { overflow: hidden; transition: height .3s ease; }
+  .gsf-ct-row--item { border-bottom: 1px solid var(--gsf-border-2); }
+  .gsf-ct-cell { min-width: 0; padding: 14px 24px; display: flex; align-items: center; gap: 8px; }
+  .gsf-ct-cell--val { justify-content: center; padding: 14px; border-left: 1px solid var(--gsf-border-2); font-weight: 600; font-variant-numeric: tabular-nums; }
+  .gsf-ct-cell--pro { background: #FAFAFA; }
+  .gsf-ct-check { display: block; width: 20px; height: 20px; position: relative; }
+  .gsf-ct-check::before {
+    content: '';
+    position: absolute;
+    left: 7px;
+    top: 2px;
+    width: 6px;
+    height: 12px;
+    border: solid var(--gsf-success);
+    border-width: 0 2.4px 2.4px 0;
+    transform: rotate(45deg);
+  }
+  .gsf-ct-dash { color: #B5B5B5; }
+  .gsf-ai-badge { padding: 2px 8px; border-radius: 999px; background: var(--gsf-magic-bg); color: var(--gsf-magic); font-size: 12px; font-weight: 600; line-height: 1.4; }
+  .gsf-visually-hidden { position: absolute !important; width: 1px; height: 1px; overflow: hidden; clip: rect(0 0 0 0); white-space: nowrap; }
+  @media (max-width: 767px) {
+    .gsf-compare { padding: 48px 0; }
+    .gsf-compare__head { align-items: center; margin-bottom: 16px; }
+    .gsf-page .gsf-compare__head .gsf-h2 { font-size: 26px; }
+    .gsf-compare__head .gsf-btn { height: 36px; padding: 0 12px; font-size: 13px; }
+    .gsf-ct-row { grid-template-columns: minmax(0, 1fr) 76px 92px; }
+    .gsf-ct-header { border-radius: 14px 14px 0 0; box-shadow: 0 8px 20px -14px rgba(26, 26, 26, .3); }
+    .gsf-ct-header__caption { padding: 12px; font-size: 13px; }
+    .gsf-ct-header__plan { padding: 12px 4px; }
+    .gsf-ct-header__name { font-size: 14px; }
+    .gsf-ct-header__btn { display: none !important; }
+    .gsf-ct-body { border-radius: 0 0 14px 14px; }
+    .gsf-page .gsf-ct-group__toggle { min-height: 52px; padding: 14px 12px; }
+    .gsf-ct-group__title { font-size: 16px; }
+    .gsf-ct-group__count { font-size: 14px; }
+    .gsf-ct-cell { padding: 12px; font-size: 14px; line-height: 1.4; }
+    .gsf-ct-cell--val { padding: 12px 4px; }
+    .gsf-ai-badge { font-size: 11px; padding: 1px 6px; }
+  }
+
+</style>
+
+{%- comment -%} Shared inline icons {%- endcomment -%}
+{%- capture gsf_icon_check -%}<svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M5 12.5l4.5 4.5L19 7.5"/></svg>{%- endcapture -%}
+{%- capture gsf_icon_chevron -%}<svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M6 9l6 6 6-6"/></svg>{%- endcapture -%}
+
+<div class="gsf-page" id="gsf-{{ section.id }}" data-gsf-root data-gsf-sticky-auto="{% if section.settings.sticky_auto == false %}false{% else %}true{% endif %}">
+
+  {%- comment -%} ===================== 1. PRICING ===================== {%- endcomment -%}
+  <section class="gsf-pricing" id="pricing-plans">
+    <div class="gsf-container" data-gsf-pricing>
+      <div class="gsf-section-head gsf-reveal" data-gsf-reveal style="margin-bottom: 40px;">
+        <span class="gsf-eyebrow">Pricing</span>
+        <h2 class="gsf-h2">Pricing that grows with your catalog</h2>
+        <p class="gsf-lead">Choose from our plans, made just for you!</p>
+        <div class="gsf-segment" role="tablist" aria-label="Your Shopify plan">
+          <button type="button" class="gsf-segment__btn" role="tab" aria-selected="true" data-gsf-platform="shopify">Shopify</button>
+          <button type="button" class="gsf-segment__btn" role="tab" aria-selected="false" data-gsf-platform="shopify_plus">Shopify Plus</button>
+        </div>
+      </div>
+
+      <div class="gsf-slider-card">
+        <div class="gsf-slider-card__head">
+          <label class="gsf-slider-card__label" for="gsf-{{ section.id }}-products">How many products are in your store?</label>
+          <span class="gsf-slider-card__value" aria-live="polite"><span data-gsf-count>500</span> <small>products</small></span>
+        </div>
+        <div class="gsf-range-wrap">
+          <input class="gsf-range" type="range" id="gsf-{{ section.id }}-products" min="0" max="22" step="1" value="0" data-gsf-range aria-valuetext="500 products">
+          <div class="gsf-range-labels" data-gsf-range-labels></div>
+        </div>
+      </div>
+
+      <div class="gsf-plans">
+        <div class="gsf-plan">
+          <div>
+            <div class="gsf-plan__name">Basic</div>
+            <div class="gsf-plan__desc">Ideal for individuals &amp; small teams</div>
+          </div>
+          <div>
+            <div class="gsf-plan__price"><span class="gsf-plan__amount">$<span data-gsf-price="price">14</span></span><span class="gsf-plan__per">/ month</span></div>
+            <div class="gsf-plan__yearly">or $<span data-gsf-price="annual_price">140</span> / year — <span class="gsf-save">save 17%</span></div>
+          </div>
+          <a class="gsf-btn gsf-btn--secondary gsf-btn--block" href="{{ gsf_pricing_url }}" target="_blank" rel="noopener nofollow">Get started</a>
+          <div class="gsf-plan__divider"></div>
+          <ul class="gsf-checklist">
+            <li>{{ gsf_icon_check }}<span>Smart search – Unlimited queries</span></li>
+            <li>{{ gsf_icon_check }}<span>Year/Make/Model search</span></li>
+            <li>{{ gsf_icon_check }}<span>Unlimited Custom Filter Trees</span></li>
+            <li>{{ gsf_icon_check }}<span>9 Types of Product Recommendation</span></li>
+            <li class="gsf-checklist__more">{{ gsf_icon_check }}<span>Display variants as products</span></li>
+            <li class="gsf-checklist__more">{{ gsf_icon_check }}<span>Unlimited Merchandising Campaigns in Search</span></li>
+            <li class="gsf-checklist__more">{{ gsf_icon_check }}<span>90-day Analytics Report</span></li>
+            <li class="gsf-checklist__more">{{ gsf_icon_check }}<span>Real-time sync</span></li>
+            <li class="gsf-checklist__more">{{ gsf_icon_check }}<span>Shopify Market Support</span></li>
+            <li class="gsf-checklist__more">{{ gsf_icon_check }}<span>Shopify B2B Support</span></li>
+          </ul>
+          <button type="button" class="gsf-plan__more-btn" aria-expanded="false" data-gsf-more>
+            <span data-gsf-more-label>Show all 10 features</span>{{ gsf_icon_chevron }}</button>
+        </div>
+
+        <div class="gsf-plan gsf-plan--pro">
+          <span class="gsf-plan__badge">Recommended</span>
+          <div>
+            <div class="gsf-plan__name">Professional</div>
+            <div class="gsf-plan__desc">Best value for large inventories</div>
+          </div>
+          <div>
+            <div class="gsf-plan__price"><span class="gsf-plan__amount">$<span data-gsf-price="price_pro">29</span></span><span class="gsf-plan__per">/ month</span></div>
+            <div class="gsf-plan__yearly">or $<span data-gsf-price="annual_price_pro">290</span> / year — <span class="gsf-save">save 17%</span></div>
+          </div>
+          <a class="gsf-btn gsf-btn--primary gsf-btn--block" href="{{ gsf_pricing_url }}" target="_blank" rel="noopener nofollow">Get started</a>
+          <div class="gsf-plan__divider"></div>
+          <div class="gsf-plan__plus">Everything in Basic, plus</div>
+          <ul class="gsf-checklist">
+            <li>{{ gsf_icon_check }}<span>AI-Powered Search</span></li>
+            <li>{{ gsf_icon_check }}<span>40 Metafields</span></li>
+            <li>{{ gsf_icon_check }}<span>Real-time sync</span></li>
+            <li>{{ gsf_icon_check }}<span>180-day Analytics Report</span></li>
+            <li>{{ gsf_icon_check }}<span>Priority Support</span></li>
+          </ul>
+        </div>
+      </div>
+
+      <div class="gsf-trial-bar">
+        <span class="gsf-trial-bar__text">Let’s start your 14-day trial for FREE!</span>
+        <a class="gsf-btn gsf-btn--light" href="{{ gsf_trial_url }}" target="_blank" rel="nofollow noopener">Try free now</a>
+      </div>
+    </div>
+  </section>
+
+  {%- comment -%}
+    ===================== 2. FULL LIST OF FEATURES =====================
+    Groups are separated by a line "==". First line of a group = its title; then one row per line:
+      Feature name|Basic|Professional     c = included, n = not included, anything else = printed as is
+      [AI] in the name = AI badge
+  {%- endcomment -%}
+  {%- capture gsf_features -%}
+Search
+Instant search display|c|c
+Keyword search (with relevance settings)|c|c
+Search suggestion dictionary|c|c
+Search redirects|c|c
+Full-text search|c|c
+Fallback search|c|c
+Custom search display|c|c
+Metafields|10|40
+Stop words|c|c
+No search result suggestion|c|c
+Spell check|c|c
+Typo tolerance|c|c
+Autocomplete|c|c
+Content search|c|c
+Manual synonyms|c|c
+In-collection search|c|c
+AI synonyms [AI]|c|c
+Scoped suggestion|c|c
+Semantic search [AI]|n|c
+==
+Product Filters
+Filter by product options &amp; attributes|c|c
+Metafields|10|40
+Multi-language|c|c
+Default collection filter tree|c|c
+Search filter tree|c|c
+Custom filters for different collections|c|c
+Multiple display options|c|c
+Swatch filters with images, color picker|c|c
+Merging values|c|c
+Code editor|c|c
+Multi-languages|c|c
+Custom range sliders|c|c
+Variants display|c|c
+Filter by product metafields &amp; variant metafields|c|c
+Filter by inventory locations|c|c
+==
+Recommendation
+Hand-picked products|c|c
+Newest arrivals|c|c
+Trending products|c|c
+Bestsellers|c|c
+Most viewed|c|c
+Recently viewed|c|c
+Recently purchased|c|c
+Frequently Bought Together|c|c
+Most added products|c|c
+==
+Analytics
+Filter analytics|c|c
+Popular filter combos|c|c
+Search analytics|c|c
+Top search queries with empty result|c|c
+Top search queries|c|c
+Most visited products|c|c
+Analytics data retention|90 days|180 days
+==
+Sync &amp; Others
+Sync frequency|c|c
+Product live sync|c|c
+Manual sync|c|c
+Multi Languages|c|c
+Multi Currencies|c|c
+Shopify Market Catalog|c|c
+B2B catalogs &amp; pricing|c|c
+Webhook sync|c|c
+Schedule sync|n|c
+Shopify API checks|n|c
+Standard Support|c|c
+Priority Support|n|c
+==
+Integration
+Globo Product Options, Variant|c|c
+SA Request a Quote, Hide Price|c|c
+GLO Color Swatch &amp; Bundles|c|c
+DECO Product Labels &amp; Badges|c|c
+Sami Product Labels &amp; Badges|c|c
+BEAST Currency Converter|c|c
+Bold Multi-Currency|c|c
+MLV Auto Currency Switcher|c|c
+Flair Product Badges + Timers|c|c
+DECO Product Labels &amp; Badges|c|c
+Prime Product Badges Stickers|c|c
+Swym Wishlist Plus|c|c
+Wishlist Hero|c|c
+Smart Wishlist|c|c
+Swish (formerly Wishlist King)|c|c
+Mst: Wishlist + Marketing flow|c|c
+Listr: Wishlist + Reminder|c|c
+Wishlist ‑ Wishify|c|c
+Froonze VIP Loyalty &amp; Wishlist|c|c
+Areviews ‑ Reviews Importer|c|c
+Fera Product Reviews App|c|c
+Opinew Product Reviews App UGC|c|c
+TYDAL Product Reviews|c|c
+Product Reviews|c|c
+Judge.me Product Reviews App|c|c
+Yotpo: Product Reviews App|c|c
+Rivyo : Reviews &amp; Loyalty App|c|c
+Stamped Reviews &amp; Loyalty|c|c
+Ryviu: Product Reviews App|c|c
+Guaranteed Reviews Company|c|c
+AfterShip Product Reviews|c|c
+Loox ‑ Visual Product Reviews|c|c
+Junip ‑ Product Reviews App|c|c
+Okendo: Reviews &amp; Loyalty|c|c
+Editorify ‑ Product Reviews|c|c
+Ali Reviews: AI Product Review|c|c
+LAI Product Reviews App|c|c
+Transcy: AI Language Translate|c|c
+Weglot: AI &amp; Human Translate|c|c
+langify ‑ translate your store|c|c
+T Lab ‑ AI Language Translate|c|c
+LangShop AI Language Translate|c|c
+  {%- endcapture -%}
+  {%- assign gsf_groups = gsf_features | split: '==' -%}
+  {%- assign gsf_total = 0 -%}
+  {%- for group in gsf_groups -%}
+    {%- assign lines = group | strip | newline_to_br | split: '<br />' -%}
+    {%- assign gsf_total = gsf_total | plus: lines.size | minus: 1 -%}
+  {%- endfor -%}
+
+  <section class="gsf-compare" id="gsf-compare">
+    <div class="gsf-container">
+      <div class="gsf-compare__head">
+        <h2 class="gsf-h2">Full list of features</h2>
+        <button type="button" class="gsf-btn gsf-btn--secondary gsf-btn--sm" data-gsf-expand-all aria-expanded="false">Expand all</button>
+      </div>
+      <div class="gsf-compare__table">
+        <div class="gsf-ct-row gsf-ct-header">
+          <div class="gsf-ct-header__caption">{{ gsf_total }} features in {{ gsf_groups.size }} groups</div>
+          <div class="gsf-ct-header__plan">
+            <span class="gsf-ct-header__name">Basic</span>
+            <a class="gsf-ct-header__btn" href="{{ gsf_pricing_url }}" target="_blank" rel="nofollow noopener">Get Basic</a>
+          </div>
+          <div class="gsf-ct-header__plan gsf-ct-header__plan--pro">
+            <span class="gsf-ct-header__name">Professional</span>
+            <a class="gsf-ct-header__btn gsf-ct-header__btn--primary" href="{{ gsf_pricing_url }}" target="_blank" rel="nofollow noopener">Get Professional</a>
+          </div>
+        </div>
+        <div class="gsf-ct-body">
+          {%- for group in gsf_groups -%}
+            {%- assign lines = group | strip | newline_to_br | split: '<br />' -%}
+            {%- assign g_title = lines[0] | strip -%}
+            {%- assign g_count = lines.size | minus: 1 -%}
+            {%- assign g_open = forloop.first -%}
+            <div class="gsf-ct-group" data-gsf-group>
+              <button type="button" class="gsf-ct-group__toggle" aria-expanded="{{ g_open }}" aria-controls="gsf-{{ section.id }}-group-{{ forloop.index0 }}" data-gsf-group-toggle>
+                <span><span class="gsf-ct-group__title">{{ g_title }}</span> <span class="gsf-ct-group__count">· {{ g_count }} {% if g_title == 'Integration' %}apps{% else %}features{% endif %}</span></span>
+                {{ gsf_icon_chevron }}
+              </button>
+              <div class="gsf-ct-group__panel" id="gsf-{{ section.id }}-group-{{ forloop.index0 }}" data-gsf-group-panel{% unless g_open %} hidden{% endunless %}>
+                {%- for line in lines offset: 1 -%}
+                  {%- assign cells = line | strip | split: '|' -%}
+                  {%- if cells.size > 0 -%}
+                    {%- assign f_name = cells[0] | remove: ' [AI]' -%}
+                    <div class="gsf-ct-row gsf-ct-row--item">
+                      <div class="gsf-ct-cell">{{ f_name }}{% if cells[0] contains '[AI]' %}<span class="gsf-ai-badge">AI</span>{% endif %}</div>
+                      {%- for col in (1..2) -%}
+                        {%- assign v = cells[col] | strip -%}
+                        <div class="gsf-ct-cell gsf-ct-cell--val{% if col == 2 %} gsf-ct-cell--pro{% endif %}">
+                          {%- if v == 'c' -%}<span class="gsf-ct-check" role="img" aria-label="Included"></span>
+                          {%- elsif v == 'n' -%}<span class="gsf-ct-dash" role="img" aria-label="Not included">—</span>
+                          {%- else -%}{{ v }}{%- endif -%}
+                        </div>
+                      {%- endfor -%}
+                    </div>
+                  {%- endif -%}
+                {%- endfor -%}
+              </div>
+            </div>
+          {%- endfor -%}
+        </div>
+      </div>
+    </div>
+  </section>
+
+</div>
+
+<script>
+  (function () {
+    /* ==========================================================================
+       PRICING DATA – identical to globo.io (Shopify = range_1, Shopify Plus = range_2).
+       Only the fields shown on the page are kept. Edit prices here.
+       ========================================================================== */
+    var GSF_PRICING = {
+      shopify: [
+        { products: 500,    price: 14,   annual_price: 140,   price_pro: 29,   annual_price_pro: 290 },
+        { products: 1000,   price: 19,   annual_price: 190,   price_pro: 39,   annual_price_pro: 390 },
+        { products: 2500,   price: 29,   annual_price: 290,   price_pro: 69,   annual_price_pro: 690 },
+        { products: 5000,   price: 69,   annual_price: 690,   price_pro: 99,   annual_price_pro: 990 },
+        { products: 7500,   price: 89,   annual_price: 890,   price_pro: 129,  annual_price_pro: 1290 },
+        { products: 10000,  price: 119,  annual_price: 1190,  price_pro: 169,  annual_price_pro: 1690 },
+        { products: 15000,  price: 149,  annual_price: 1490,  price_pro: 209,  annual_price_pro: 2090 },
+        { products: 20000,  price: 179,  annual_price: 1790,  price_pro: 249,  annual_price_pro: 2490 },
+        { products: 25000,  price: 209,  annual_price: 2090,  price_pro: 289,  annual_price_pro: 2890 },
+        { products: 30000,  price: 239,  annual_price: 2390,  price_pro: 329,  annual_price_pro: 3290 },
+        { products: 35000,  price: 269,  annual_price: 2690,  price_pro: 359,  annual_price_pro: 3590 },
+        { products: 40000,  price: 299,  annual_price: 2990,  price_pro: 399,  annual_price_pro: 3990 },
+        { products: 45000,  price: 329,  annual_price: 3290,  price_pro: 439,  annual_price_pro: 4390 },
+        { products: 50000,  price: 359,  annual_price: 3590,  price_pro: 479,  annual_price_pro: 4790 },
+        { products: 100000, price: 799,  annual_price: 7990,  price_pro: 1049, annual_price_pro: 10490 },
+        { products: 150000, price: 1049, annual_price: 10490, price_pro: 1379, annual_price_pro: 13790 },
+        { products: 200000, price: 1299, annual_price: 12990, price_pro: 1699, annual_price_pro: 16990 },
+        { products: 250000, price: 1549, annual_price: 15490, price_pro: 2029, annual_price_pro: 20290 },
+        { products: 300000, price: 1799, annual_price: 17990, price_pro: 2349, annual_price_pro: 23490 },
+        { products: 350000, price: 2049, annual_price: 20490, price_pro: 2679, annual_price_pro: 26790 },
+        { products: 400000, price: 2299, annual_price: 22990, price_pro: 2999, annual_price_pro: 29990 },
+        { products: 450000, price: 2549, annual_price: 25490, price_pro: 3329, annual_price_pro: 33290 },
+        { products: 500000, price: 2799, annual_price: 27990, price_pro: 3649, annual_price_pro: 36490 }
+      ],
+      shopify_plus: [
+        { products: 500,    price: 69,   annual_price: 690,   price_pro: 99,   annual_price_pro: 990 },
+        { products: 1000,   price: 79,   annual_price: 790,   price_pro: 119,  annual_price_pro: 1190 },
+        { products: 2500,   price: 99,   annual_price: 990,   price_pro: 139,  annual_price_pro: 1390 },
+        { products: 5000,   price: 119,  annual_price: 1190,  price_pro: 169,  annual_price_pro: 1690 },
+        { products: 7500,   price: 149,  annual_price: 1490,  price_pro: 209,  annual_price_pro: 2090 },
+        { products: 10000,  price: 169,  annual_price: 1690,  price_pro: 229,  annual_price_pro: 2290 },
+        { products: 15000,  price: 199,  annual_price: 1990,  price_pro: 269,  annual_price_pro: 2690 },
+        { products: 20000,  price: 229,  annual_price: 2290,  price_pro: 309,  annual_price_pro: 3090 },
+        { products: 25000,  price: 259,  annual_price: 2590,  price_pro: 349,  annual_price_pro: 3490 },
+        { products: 30000,  price: 289,  annual_price: 2890,  price_pro: 389,  annual_price_pro: 3890 },
+        { products: 35000,  price: 319,  annual_price: 3190,  price_pro: 429,  annual_price_pro: 4290 },
+        { products: 40000,  price: 349,  annual_price: 3490,  price_pro: 469,  annual_price_pro: 4690 },
+        { products: 45000,  price: 379,  annual_price: 3790,  price_pro: 509,  annual_price_pro: 5090 },
+        { products: 50000,  price: 409,  annual_price: 4090,  price_pro: 549,  annual_price_pro: 5490 },
+        { products: 100000, price: 799,  annual_price: 7990,  price_pro: 1049, annual_price_pro: 10490 },
+        { products: 150000, price: 1049, annual_price: 10490, price_pro: 1379, annual_price_pro: 13790 },
+        { products: 200000, price: 1299, annual_price: 12990, price_pro: 1699, annual_price_pro: 16990 },
+        { products: 250000, price: 1549, annual_price: 15490, price_pro: 2029, annual_price_pro: 20290 },
+        { products: 300000, price: 1899, annual_price: 18990, price_pro: 2479, annual_price_pro: 24790 },
+        { products: 350000, price: 2049, annual_price: 20490, price_pro: 2679, annual_price_pro: 26790 },
+        { products: 400000, price: 2299, annual_price: 22990, price_pro: 2999, annual_price_pro: 29990 },
+        { products: 450000, price: 2549, annual_price: 25490, price_pro: 3329, annual_price_pro: 33290 },
+        { products: 500000, price: 2799, annual_price: 27990, price_pro: 3649, annual_price_pro: 36490 }
+      ]
+    };
+    var GSF_START_PRODUCTS = 500;          // the slider starts here (same as the original page)
+    // Slider labels: one label per price tier, evenly spaced (every slider step has the same width).
+    // Desktop shows all, tablet shows every 2nd label, mobile shows first / middle / last.
+
+    var reduceMotion = window.matchMedia && window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+    function fmt(n) { return Number(n).toLocaleString('en-US'); }
+    function short(n) {
+      if (n >= 1000000) return (Math.round(n / 100000) / 10) + 'M';
+      if (n >= 1000) return (Math.round(n / 100) / 10) + 'K';
+      return String(n);
+    }
+
+    /* ---------- Expand / collapse with height animation (feature groups) ---------- */
+    function setOpen(btn, panel, open, animate) {
+      btn.setAttribute('aria-expanded', open ? 'true' : 'false');
+      if (!animate || reduceMotion) {
+        panel.hidden = !open;
+        panel.style.height = '';
+        return;
+      }
+      if (open) {
+        panel.hidden = false;
+        var h = panel.scrollHeight;
+        panel.style.height = '0px';
+        panel.offsetHeight; // reflow
+        panel.style.height = h + 'px';
+        panel.addEventListener('transitionend', function done(e) {
+          if (e.target !== panel) return;
+          panel.removeEventListener('transitionend', done);
+          if (btn.getAttribute('aria-expanded') === 'true') panel.style.height = '';
+        });
+      } else {
+        panel.style.height = panel.scrollHeight + 'px';
+        panel.offsetHeight;
+        panel.style.height = '0px';
+        panel.addEventListener('transitionend', function done(e) {
+          if (e.target !== panel) return;
+          panel.removeEventListener('transitionend', done);
+          if (btn.getAttribute('aria-expanded') === 'false') { panel.hidden = true; panel.style.height = ''; }
+        });
+      }
+    }
+
+    /* ---------- Pricing: platform switch + product slider ---------- */
+    function initPricing(root) {
+      var box = root.querySelector('[data-gsf-pricing]');
+      if (!box) return;
+      var range = box.querySelector('[data-gsf-range]');
+      var countEl = box.querySelector('[data-gsf-count]');
+      var priceEls = box.querySelectorAll('[data-gsf-price]');
+      var platformBtns = box.querySelectorAll('[data-gsf-platform]');
+      var labelsWrap = box.querySelector('[data-gsf-range-labels]');
+      var platform = 'shopify';
+      var products = GSF_PRICING.shopify.map(function (p) { return p.products; });
+      var max = products.length - 1;
+      range.max = max;
+      var start = products.indexOf(GSF_START_PRODUCTS);
+      range.value = start < 0 ? 0 : start;
+
+      var mid = Math.round(max / 4) * 2;   // middle label on an even step, so it is also kept on tablet
+      var labelBtns = products.map(function (count, idx) {
+        var edge = idx === 0 || idx === max;
+        var b = document.createElement('button');
+        b.type = 'button';
+        b.className = 'gsf-range-label' +
+          (!edge && idx % 2 === 1 ? ' gsf-range-label--d' : '') +            // hidden on tablet (≤1024px)
+          (!edge && idx !== mid ? ' gsf-range-label--t' : '') +              // hidden on mobile (≤767px)
+          (idx === 0 ? ' gsf-range-label--first' : '') + (idx === max ? ' gsf-range-label--last' : '');
+        b.style.setProperty('--p', idx / max);
+        b.textContent = short(count);
+        b.setAttribute('aria-label', 'Set to ' + fmt(count) + ' products');
+        b.tabIndex = -1;
+        b.dataset.idx = idx;
+        b.addEventListener('click', function () { range.value = idx; update(); });
+        labelsWrap.appendChild(b);
+        return b;
+      });
+
+      function update() {
+        var plans = GSF_PRICING[platform];
+        var idx = Math.max(0, Math.min(parseInt(range.value, 10) || 0, plans.length - 1));
+        var plan = plans[idx];
+        countEl.textContent = fmt(plan.products);
+        range.setAttribute('aria-valuetext', fmt(plan.products) + ' products');
+        range.style.setProperty('--gsf-fill', (idx / (plans.length - 1) * 100) + '%');
+        priceEls.forEach(function (el) {
+          var key = el.getAttribute('data-gsf-price');
+          if (plan[key] !== undefined) el.textContent = fmt(plan[key]);
+        });
+        labelBtns.forEach(function (b) { b.classList.toggle('is-active', +b.dataset.idx === idx); });
+      }
+      range.addEventListener('input', update);
+      range.addEventListener('change', update);
+      platformBtns.forEach(function (btn) {
+        btn.addEventListener('click', function () {
+          platform = btn.getAttribute('data-gsf-platform');
+          platformBtns.forEach(function (b) { b.setAttribute('aria-selected', b === btn ? 'true' : 'false'); });
+          update();
+        });
+      });
+
+      // "Show all 10 features" (mobile)
+      box.querySelectorAll('[data-gsf-more]').forEach(function (btn) {
+        var card = btn.closest('.gsf-plan');
+        var label = btn.querySelector('[data-gsf-more-label]');
+        btn.addEventListener('click', function () {
+          var open = !card.classList.contains('is-expanded');
+          card.classList.toggle('is-expanded', open);
+          btn.setAttribute('aria-expanded', open ? 'true' : 'false');
+          label.textContent = open ? 'Show fewer features' : 'Show all 10 features';
+        });
+      });
+      update();
+    }
+
+    /* ---------- Feature table groups ---------- */
+    function initCompare(root) {
+      var groups = Array.prototype.slice.call(root.querySelectorAll('[data-gsf-group]')).map(function (g) {
+        return { btn: g.querySelector('[data-gsf-group-toggle]'), panel: g.querySelector('[data-gsf-group-panel]') };
+      });
+      var all = root.querySelector('[data-gsf-expand-all]');
+      function syncAll() {
+        var allOpen = groups.every(function (g) { return g.btn.getAttribute('aria-expanded') === 'true'; });
+        all.textContent = allOpen ? 'Collapse all' : 'Expand all';
+        all.setAttribute('aria-expanded', allOpen ? 'true' : 'false');
+      }
+      groups.forEach(function (g) {
+        g.btn.addEventListener('click', function () {
+          setOpen(g.btn, g.panel, g.btn.getAttribute('aria-expanded') !== 'true', true);
+          syncAll();
+        });
+      });
+      if (all) {
+        all.addEventListener('click', function () {
+          var open = all.getAttribute('aria-expanded') !== 'true';
+          groups.forEach(function (g) { setOpen(g.btn, g.panel, open, false); });
+          syncAll();
+        });
+        syncAll();
+      }
+    }
+
+    /* ---------- Sticky Basic / Professional header of the feature table ----------
+       1) position:sticky breaks when an ancestor has overflow:hidden – swap it for overflow:clip
+          (looks identical, does not create a scroll container).
+       2) Auto-detect fixed/sticky bars of the theme at the top of the viewport (header,
+          announcement bar, toolbars) and stick below them. Manual offsets in the section
+          settings are used when auto-detect is off. */
+    function initSticky(root) {
+      if (!root.querySelector('.gsf-ct-header')) return;
+      if (window.CSS && CSS.supports('overflow', 'clip')) {
+        for (var el = root.parentElement; el && el !== document.body && el !== document.documentElement; el = el.parentElement) {
+          var cs = getComputedStyle(el);
+          if (/(auto|scroll)/.test(cs.overflowX + cs.overflowY)) break;
+          if (cs.overflowX === 'hidden') el.style.overflowX = 'clip';
+          if (cs.overflowY === 'hidden') el.style.overflowY = 'clip';
+        }
+      }
+      var auto = root.getAttribute('data-gsf-sticky-auto') === 'true';
+      var bars = [], ticking = false;
+      function scan() {
+        bars = [];
+        if (!auto) return;
+        var vw = window.innerWidth, vh = window.innerHeight;
+        var all = document.body.getElementsByTagName('*');
+        for (var i = 0; i < all.length; i++) {
+          var node = all[i];
+          if (root.contains(node)) continue;
+          var pos = getComputedStyle(node).position;
+          if (pos !== 'fixed' && pos !== 'sticky') continue;
+          var r = node.getBoundingClientRect();
+          if (r.width >= vw * 0.5 && r.height > 0 && r.height < vh * 0.4) bars.push(node);
+        }
+      }
+      function update() {
+        ticking = false;
+        if (!auto) return;
+        var offset = 0, vh = window.innerHeight;
+        bars.forEach(function (b) {
+          var r = b.getBoundingClientRect();
+          if (r.top <= 1 && r.bottom > 0 && r.bottom < vh * 0.4 && getComputedStyle(b).visibility !== 'hidden') offset = Math.max(offset, r.bottom);
+        });
+        root.style.setProperty('--gsf-top', Math.round(offset) + 'px');
+      }
+      function request() { if (!ticking) { ticking = true; requestAnimationFrame(update); } }
+      var t;
+      function rescan() { clearTimeout(t); t = setTimeout(function () { scan(); request(); }, 150); }
+      scan();
+      update();
+      document.addEventListener('scroll', request, { passive: true, capture: true });
+      window.addEventListener('resize', rescan);
+      window.addEventListener('load', rescan);
+      setTimeout(rescan, 1500);
+    }
+
+    /* ---------- Reveal on scroll ---------- */
+    function initReveal(root) {
+      var items = root.querySelectorAll('[data-gsf-reveal]');
+      if (reduceMotion || (window.Shopify && window.Shopify.designMode) || !('IntersectionObserver' in window)) {
+        items.forEach(function (el) { el.classList.add('is-on'); });
+        return;
+      }
+      var io = new IntersectionObserver(function (entries) {
+        entries.forEach(function (en) { if (en.isIntersecting) { en.target.classList.add('is-on'); io.unobserve(en.target); } });
+      }, { rootMargin: '0px 0px -60px 0px' });
+      items.forEach(function (el) { io.observe(el); });
+    }
+
+    function init(root) {
+      if (!root || root.dataset.gsfInit) return;
+      root.dataset.gsfInit = '1';
+      initReveal(root);
+      initSticky(root);
+      initPricing(root);
+      initCompare(root);
+    }
+    function boot() { document.querySelectorAll('[data-gsf-root]').forEach(init); }
+    if (document.readyState === 'loading') document.addEventListener('DOMContentLoaded', boot); else boot();
+    document.addEventListener('shopify:section:load', function (e) { init(e.target.querySelector('[data-gsf-root]')); });
+  })();
+</script>
+
+{% schema %}
+{
+  "name": "Globo pricing plans",
+  "tag": "div",
+  "class": "gsf-section",
+  "settings": [
+    {
+      "type": "header",
+      "content": "Feature table sticky header"
+    },
+    {
+      "type": "checkbox",
+      "id": "sticky_auto",
+      "label": "Auto-detect offset",
+      "info": "Places the sticky Basic/Professional bar of the feature table right below any fixed or sticky bar of the theme: header, announcement bar, toolbar. Turn off to use the manual values below.",
+      "default": true
+    },
+    {
+      "type": "range",
+      "id": "sticky_top",
+      "label": "Manual offset – desktop (px)",
+      "info": "Height of your theme's sticky header on desktop.",
+      "min": 0,
+      "max": 200,
+      "step": 4,
+      "unit": "px",
+      "default": 0
+    },
+    {
+      "type": "range",
+      "id": "sticky_top_mobile",
+      "label": "Manual offset – mobile (px)",
+      "info": "Height of your theme's sticky header on screens under 768px.",
+      "min": 0,
+      "max": 200,
+      "step": 4,
+      "unit": "px",
+      "default": 0
+    }
+  ],
+  "presets": [
+    {
+      "name": "Globo pricing plans"
+    }
+  ]
+}
+{% endschema %}

@@ -1,0 +1,97 @@
+<div id="gf-bfcm-promo" class="gf-promo" hidden>
+  <button class="gf-promo__trigger" type="button" aria-expanded="false" aria-controls="gf-bfcm-promo-dialog">
+    <span class="gf-promo__gift" aria-hidden="true">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+        <rect x="3" y="8" width="18" height="4" rx="1"></rect>
+        <path d="M12 8v13M5 12v7a2 2 0 0 0 2 2h10a2 2 0 0 0 2-2v-7"></path>
+        <path d="M7.5 8a2.5 2.5 0 0 1 0-5C9.5 3 12 8 12 8s2.5-5 4.5-5a2.5 2.5 0 0 1 0 5"></path>
+      </svg>
+    </span>
+    <span class="gf-promo__trigger-copy">
+      <strong data-gf-promo-badge></strong>
+      <span data-gf-promo-trigger-text></span>
+    </span>
+  </button>
+
+  <div class="gf-promo__overlay" data-gf-promo-overlay hidden>
+    <section class="gf-promo__dialog" id="gf-bfcm-promo-dialog" role="dialog" aria-modal="true" aria-labelledby="gf-bfcm-promo-title" tabindex="-1">
+      <button class="gf-promo__close" type="button" aria-label="Close promotion">&times;</button>
+      <p class="gf-promo__eyebrow">BFCM 2026 <span aria-hidden="true">&#183;</span> <span data-gf-promo-phase></span></p>
+      <div class="gf-promo__offer">
+        <strong data-gf-promo-percent></strong>
+        <span>OFF</span>
+        <span class="gf-promo__offer-duration" data-gf-promo-duration></span>
+      </div>
+      <div class="gf-promo__content">
+        <h2 id="gf-bfcm-promo-title" data-gf-promo-title></h2>
+        <p data-gf-promo-description></p>
+        <p class="gf-promo__annual" data-gf-promo-annual></p>
+        <p class="gf-promo__ends">Offer ends <time data-gf-promo-end></time> <span class="gf-promo__local">(local time)</span></p>
+        <a class="gf-promo__cta" href="https://apps.shopify.com/product-filter-and-search?show_store_picker=1">Start free</a>
+        <p class="gf-promo__eligibility">For new app users and stores on the Free plan. Applied automatically when you choose a plan — no code needed.</p>
+      </div>
+    </section>
+  </div>
+</div>
+
+<style>
+  .gf-promo, .gf-promo * { box-sizing: border-box; }
+  .gf-promo { --gf-promo-bg-1: #551651; --gf-promo-bg-2: #671b55; --gf-promo-bg-3: #7a2651; --gf-promo-accent: #e9475b; --gf-promo-glass: rgba(255,255,255,.14); --gf-promo-ring: rgba(255,255,255,.22); --gf-promo-muted: rgba(255,255,255,.86); font-family: Inter, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif; }
+  .gf-promo[hidden], .gf-promo [hidden] { display: none !important; }
+  .gf-promo__trigger {
+    position: fixed; left: 20px; bottom: 24px; z-index: 2147482998;
+    display: flex; align-items: stretch; min-height: 58px; padding: 0;
+    color: #fff; background: radial-gradient(120% 140% at 0% 0%, rgba(135,27,83,.55) 0%, rgba(135,27,83,0) 55%), linear-gradient(100deg, var(--gf-promo-bg-1) 0%, var(--gf-promo-bg-2) 55%, var(--gf-promo-bg-3) 100%);
+    border: 1px solid rgba(255,255,255,.2); border-radius: 16px; box-shadow: 0 12px 32px rgba(39,4,34,.28);
+    cursor: pointer; overflow: hidden; font: inherit; text-align: left;
+  }
+  .gf-promo__trigger:focus-visible, .gf-promo__close:focus-visible, .gf-promo__cta:focus-visible { outline: 3px solid #fff; outline-offset: 3px; }
+  .gf-promo__gift { position: relative; overflow: hidden; display: grid; place-items: center; width: 58px; background: var(--gf-promo-glass); }
+  .gf-promo__gift::after { content: ""; position: absolute; inset: -40% auto -40% -80%; width: 45%; background: linear-gradient(100deg, transparent, rgba(255,255,255,.45), transparent); transform: translateX(0) skewX(-18deg); animation: gf-promo-shine 5.5s ease-in-out 1.2s infinite; pointer-events: none; }
+  .gf-promo__gift svg { width: 25px; height: 25px; }
+  .gf-promo__trigger-copy { display: flex; flex-direction: column; justify-content: center; gap: 1px; padding: 9px 16px 9px 13px; }
+  .gf-promo__trigger-copy strong { font-size: 14px; line-height: 1.2; font-weight: 800; letter-spacing: .02em; background: linear-gradient(180deg, #fff 30%, #f7b6cc 100%); -webkit-background-clip: text; background-clip: text; color: transparent; }
+  .gf-promo__trigger-copy > span { font-size: 12px; line-height: 1.3; opacity: .9; }
+  .gf-promo__overlay { position: fixed; inset: 0; z-index: 2147482999; display: grid; align-items: end; justify-items: start; padding: 24px 20px 96px; background: rgba(22,7,15,.42); backdrop-filter: blur(2px); }
+  .gf-promo__dialog {
+    position: relative; display: grid; grid-template-columns: 112px minmax(0,1fr); gap: 18px;
+    width: min(600px, calc(100vw - 40px)); padding: 24px;
+    color: #fff; background: radial-gradient(120% 140% at 0% 0%, rgba(135,27,83,.55) 0%, rgba(135,27,83,0) 55%), linear-gradient(100deg, var(--gf-promo-bg-1) 0%, var(--gf-promo-bg-2) 55%, var(--gf-promo-bg-3) 100%);
+    border: 1px solid rgba(255,255,255,.24); border-radius: 22px; box-shadow: 0 22px 70px rgba(34,5,25,.38);
+  }
+  .gf-promo__close { position: absolute; top: 10px; right: 12px; width: 34px; height: 34px; padding: 0; color: #fff; background: rgba(255,255,255,.12); border: 1px solid rgba(255,255,255,.22); border-radius: 50%; cursor: pointer; font: 26px/1 inherit; }
+  .gf-promo__eyebrow { grid-column: 1/-1; margin: 0; padding-right: 36px; color: #ffdbe4; font-size: 12px; font-weight: 700; letter-spacing: .11em; text-transform: uppercase; }
+  .gf-promo__offer { position: relative; overflow: hidden; display: flex; min-width: 112px; flex-direction: column; align-items: center; justify-content: center; align-self: start; padding: 13px 14px 10px; border: 1px solid rgba(255,255,255,.28); border-radius: 16px; background: linear-gradient(160deg, rgba(255,255,255,.2), rgba(255,255,255,.08)); box-shadow: inset 0 1px 0 rgba(255,255,255,.25), 0 10px 24px -14px rgba(0,0,0,.5); -webkit-backdrop-filter: blur(10px); backdrop-filter: blur(10px); -webkit-mask: radial-gradient(circle 9px at 0 50%, transparent 98%, #000) left / 51% 100% no-repeat, radial-gradient(circle 9px at 100% 50%, transparent 98%, #000) right / 51% 100% no-repeat; mask: radial-gradient(circle 9px at 0 50%, transparent 98%, #000) left / 51% 100% no-repeat, radial-gradient(circle 9px at 100% 50%, transparent 98%, #000) right / 51% 100% no-repeat; }
+  .gf-promo__offer::after { content: ""; position: absolute; inset: -40% auto -40% -60%; width: 45%; background: linear-gradient(100deg, transparent, rgba(255,255,255,.45), transparent); transform: translateX(0) skewX(-18deg); animation: gf-promo-shine 5.5s ease-in-out 1.2s infinite; pointer-events: none; }
+  @keyframes gf-promo-shine { 0% { transform: translateX(0) skewX(-18deg); opacity: 0; } 12% { opacity: 1; } 38%, 100% { transform: translateX(420%) skewX(-18deg); opacity: 0; } }
+  .gf-promo__offer strong { font-size: 30px; line-height: 1; font-weight: 800; letter-spacing: -.03em; font-variant-numeric: tabular-nums; background: linear-gradient(180deg, #fff 30%, #f7b6cc 100%); -webkit-background-clip: text; background-clip: text; color: transparent; white-space: nowrap; }
+  .gf-promo__offer > span:not(.gf-promo__offer-duration) { margin-top: 4px; font-size: 10px; font-weight: 700; letter-spacing: .32em; text-indent: .32em; color: var(--gf-promo-muted); }
+  .gf-promo__offer-duration { align-self: stretch; margin-top: 7px; padding-top: 6px; border-top: 1px solid rgba(255,255,255,.22); color: var(--gf-promo-muted); font-size: 11px; font-weight: 600; line-height: 1.25; letter-spacing: normal; text-align: center; text-indent: 0; white-space: nowrap; }
+  .gf-promo__content h2 { margin: 0 30px 8px 0; color: #fff; font-size: 22px; line-height: 1.18; font-weight: 550; }
+  .gf-promo__content p { margin: 0 0 10px; color: rgba(255,255,255,.88); font-size: 14px; line-height: 1.45; }
+  .gf-promo__content .gf-promo__annual { color: #ffd1dc; font-weight: 600; }
+  .gf-promo__content .gf-promo__ends { margin-top: 14px; font-size: 12px; }
+  .gf-promo__ends time { color: #fff; font-weight: 700; }
+  .gf-promo__local { opacity: .74; }
+  .gf-promo__cta { display: inline-flex; min-height: 42px; align-items: center; justify-content: center; margin-top: 4px; padding: 9px 18px; color: #5d0a32; background: #fff; border-radius: 999px; font-size: 14px; font-weight: 700; text-decoration: none; }
+  .gf-promo__content .gf-promo__eligibility { margin: 10px 0 0; font-size: 11px; opacity: .76; }
+  @media (max-width: 600px) {
+    .gf-promo__trigger { left: 16px; bottom: 100px; max-width: calc(100vw - 32px); transform: none; }
+    .gf-promo__overlay { align-items: end; justify-items: center; padding: 16px 16px 88px; }
+    .gf-promo__dialog { grid-template-columns: 1fr; justify-items: center; gap: 14px; width: 100%; max-width: 570px; padding: 22px 20px; text-align: center; border-radius: 20px; }
+    .gf-promo__eyebrow { padding: 0 30px; }
+    .gf-promo__offer { width: auto; min-width: 84px; padding: 10px 12px; }
+    .gf-promo__offer strong { font-size: 26px; }
+    .gf-promo__content { width: 100%; }
+    .gf-promo__content h2 { margin-right: 0; font-size: 21px; }
+    .gf-promo__cta { width: 100%; }
+  }
+  @media (prefers-reduced-motion: reduce) { .gf-promo__offer::after, .gf-promo__gift::after { animation: none; opacity: 0; } }
+  @media (prefers-reduced-motion: no-preference) {
+    .gf-promo__trigger { transition: transform .18s ease, box-shadow .18s ease; }
+    .gf-promo__trigger:hover { transform: translateY(-2px); box-shadow: 0 15px 38px rgba(39,4,34,.34); }
+    @media (max-width: 600px) { .gf-promo__trigger:hover { transform: translateY(-2px); } }
+  }
+</style>
+
+<script src="{{ 'gf-bfcm.js' | asset_url }}" defer="defer"></script>

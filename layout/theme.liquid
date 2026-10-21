@@ -10,6 +10,7 @@
   style="background:#000"
 >
   <head> 
+    {%- render 'meta-tags' -%}
     <script>
       (() => {
         const isMobileViewport = window.matchMedia('(max-width: 749px)').matches;
@@ -157,7 +158,6 @@
       >
     {% endif %}
 
-    {%- render 'meta-tags' -%}
     {%- render 'stylesheets' -%}
     {%- render 'fonts' -%}
     {%- render 'scripts' -%}

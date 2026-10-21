@@ -1241,6 +1241,7 @@ span.header-logo__image-container.header-logo__image-container--original {
 .gpf-demo-button__icon {
     display: none;
     flex-shrink: 0;
+    pointer-events: none;
 }
 
 .gpf-demo-button__eye-slash {
@@ -1302,7 +1303,7 @@ span.header-logo__image-container.header-logo__image-container--original {
 
     .gpf-demo-toolbar__select-field {
         min-width: 0;
-        min-height: 44px;
+        min-height: 40px;
         width: 100%;
         padding-left: 10px;
     }
@@ -1343,14 +1344,14 @@ span.header-logo__image-container.header-logo__image-container--original {
     .gpf-demo-toolbar__actions .gpf-demo-button {
         width: auto;
         min-width: 0;
-        min-height: 44px;
-        padding: 8px 12px;
+        min-height: 40px;
+        padding: 6px 12px;
         font-size: 12px;
         white-space: nowrap;
     }
 
     .gpf-demo-toolbar__actions .gpf-demo-button--icon-mobile {
-        width: 44px;
+        width: 40px;
         padding: 0;
         background: transparent;
     }

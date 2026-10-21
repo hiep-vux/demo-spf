@@ -89,6 +89,8 @@ class GloboDemoControls {
 
     if (navigationState.layout) this.toolbar.dataset.activeLayout = navigationState.layout;
     this.handleClick = this.handleClick.bind(this);
+    this.handleGuideToggle = this.handleGuideToggle.bind(this);
+    this.guideToggle = this.toolbar.querySelector('[data-demo-action="toggle-guide"]');
     this.handleChange = this.handleChange.bind(this);
     this.handleGuideStepCapture = this.handleGuideStepCapture.bind(this);
     this.handleViewportChange = this.handleViewportChange.bind(this);
@@ -104,6 +106,7 @@ class GloboDemoControls {
     if (!this.root) return;
 
     this.root.addEventListener('click', this.handleClick);
+    this.guideToggle?.addEventListener('click', this.handleGuideToggle);
     this.root.addEventListener('change', this.handleChange);
     this.root.addEventListener('click', this.handleGuideStepCapture, true);
     this.mobileBreakpoint.addEventListener('change', this.handleViewportChange);
@@ -131,6 +134,7 @@ class GloboDemoControls {
 
   destroy() {
     this.root?.removeEventListener('click', this.handleClick);
+    this.guideToggle?.removeEventListener('click', this.handleGuideToggle);
     this.root?.removeEventListener('change', this.handleChange);
     this.root?.removeEventListener('click', this.handleGuideStepCapture, true);
     this.mobileBreakpoint.removeEventListener('change', this.handleViewportChange);
@@ -169,6 +173,13 @@ class GloboDemoControls {
 
   openGuide() {
     this.setState({ guideOpen: true });
+  }
+
+  handleGuideToggle(event) {
+    event.preventDefault();
+    event.stopPropagation();
+    if (this.state.guideOpen) this.setState({ guideOpen: false });
+    else this.openGuide();
   }
 
   refreshGuide() {

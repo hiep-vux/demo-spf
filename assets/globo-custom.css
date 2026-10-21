@@ -655,24 +655,8 @@ html[data-demo-loading="complete"] .demo-storefront-skeleton {
     display: block;
     position: fixed;
     inset: 0;
-    width: auto;
-    height: auto;
-    margin: 0;
-    padding: 0;
-    border: 0;
-    background: transparent;
-    overflow: visible;
     z-index: 90;
     pointer-events: none;
-  }
-
-  #gpf-demo .gpf-demo-guide-section::backdrop {
-    background: transparent;
-    pointer-events: none;
-  }
-
-  #gpf-demo .gpf-demo-guide-section[popover]:not(:popover-open) {
-    display: none;
   }
 
   #gpf-demo:not([data-demo-guide="open"]) .gpf-demo-guide__trigger {

@@ -1247,7 +1247,7 @@ span.header-logo__image-container.header-logo__image-container--original {
     display: none;
 }
 
-[data-demo-action="toggle-guide"][aria-expanded="false"] .gpf-demo-button__eye-slash {
+[data-demo-action="toggle-guide"][aria-expanded="true"] .gpf-demo-button__eye-slash {
     display: block;
 }
 
@@ -1273,6 +1273,10 @@ span.header-logo__image-container.header-logo__image-container--original {
 }
 
 @media screen and (max-width: 749px) {
+    #gpf-demo[data-demo-guide] .gpf-demo-guide__trigger {
+        display: none;
+    }
+
     .gpf-demo-toolbar {
         display: grid;
         grid-template-columns: minmax(0, 1fr) auto;
